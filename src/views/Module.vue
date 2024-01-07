@@ -22,16 +22,18 @@
         class="btn waves-effect waves-light"
         type="submit"
         name="action"
-        @click="NextCard"
+        @click="showStatistics = !showStatistics"
       >
         Статистика
       </button>
     </div>
   </div>
+  <Statistics v-if="showStatistics"/>
 </template>
 
 <script>
 import CardList from "@/components/cards/CardList";
+import Statistics from "@/components/cards/Statistics";
 
 export default {
   data() {
@@ -62,10 +64,12 @@ export default {
           flipped: false,
         },
       ],
+      showStatistics: false,
     };
   },
   components: {
     CardList,
+    Statistics,
   },
 };
 </script>
