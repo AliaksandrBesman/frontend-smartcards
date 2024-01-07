@@ -14,6 +14,13 @@ const routes = [
     meta: {layout: 'empty'},
 
     component: () => import('../views/Login.vue')
+  },
+  {
+    path: '/module',
+    name: 'module',
+    meta: {layout: 'main'},
+
+    component: () => import('../views/Module.vue')
   }
 ]
 
