@@ -11,7 +11,7 @@
         class="btn waves-effect waves-light"
         type="submit"
         name="action"
-        @click="NextCard"
+       @click="this.$router.push('/test')"
       >
         Тест
       </button>
@@ -29,11 +29,13 @@
     </div>
   </div>
   <Statistics v-if="showStatistics"/>
+  <Comments/>
 </template>
 
 <script>
 import CardList from "@/components/cards/CardList";
 import Statistics from "@/components/cards/Statistics";
+import Comments from "@/components/cards/Comments";
 
 export default {
   data() {
@@ -70,6 +72,7 @@ export default {
   components: {
     CardList,
     Statistics,
+    Comments
   },
 };
 </script>
