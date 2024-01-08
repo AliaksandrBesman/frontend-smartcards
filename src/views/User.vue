@@ -54,25 +54,13 @@
 
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
-  data() {
-    return {
-      user: {
-        login: 'user123',
-        role: 'ученик',
-        name: 'Иван',
-        surname: 'Иванов',
-        patronymic: 'Иванович',
-        faculty: 'Информационных технологий',
-        department: 'Программной инженерии',
-        specialization: 'Информационные системы и технологии',
-        course: 3,
-        group: 'ИСТ-32'
-      }
-    }
+  computed:{
+    ...mapGetters(['user'])
   },
   mounted() {
-    M.updateTextFields();
+    setTimeout(()=>{M.updateTextFields()},0)
   },
 }
 </script>

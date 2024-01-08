@@ -12,7 +12,6 @@
               id="login"
               type="text"
               v-model="login"
-
             />
             <label for="login">Login</label>
             <!-- <span
@@ -24,11 +23,7 @@
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <input
-              id="password"
-              type="password"
-              v-model="password"
-            />
+            <input id="password" type="password" v-model="password" />
             <label for="password">Password</label>
             <!-- <span v-if="v$.password.$error" class="helper-text" :data-error="v$.password.required.$message"></span> -->
           </div>
@@ -38,7 +33,7 @@
     <div class="modal-footer">
       <div class="row">
         <div class="col s12">
-          <button class="btn waves-effect waves-light" @click="LoginUser">
+          <button class="btn waves-effect waves-light" @click="loginUser">
             Login
             <i class="material-icons right">send</i>
           </button>
@@ -58,8 +53,25 @@ export default {
       submitStatus: null,
     };
   },
+  methods: {
+    ...mapActions(["fetchLogin"]),
+    loginUser() {
+
+      const userInfo = {
+        login: this.login,
+        password: this.password,
+      };
+
+      try {
+        this.fetchLogin(userInfo);
+        this.$router.push("/");
+      } catch (e) {}
+    },
+  },
   mounted() {
-    M.updateTextFields();
+    setTimeout(() => {
+      M.updateTextFields();
+    }, 0);
   },
 };
 </script>

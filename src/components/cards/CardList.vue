@@ -1,36 +1,20 @@
 <template>
-  <div ref="carousel" class="carousel carousel-slider center">
-    <Item v-for="(card, index) in cards" :key="index" :card="card" />
-  </div>
+    <div class="row">
+      <div class="col s12">
+        <!-- Карусель с заданиями -->
+        <div ref="carousel" class="carousel carousel-slider">
+          <Item v-for="(card, index) in cards" :key="index" :card="card" />
+        </div>
+      </div>
+    </div>
 
   <div class="row">
-    <div class="col s6 offset-s3">
-      <div class="outer-div">
-        <div class="inner-div">
-          <button
-            class="btn waves-effect waves-light"
-            type="submit"
-            name="action"
-            @click="PrevCard"
-          >
-            Назад
-            <i class="material-icons left">keyboard_arrow_left</i>
-          </button>
-        </div>
-        <div class="inner-div">
-          <span>{{ currentCard }}/{{ cards.length }}</span>
-        </div>
-        <div class="inner-div">
-          <button
-            class="btn waves-effect waves-light"
-            type="submit"
-            name="action"
-            @click="NextCard"
-          >
-            Вперед
-            <i class="material-icons right">keyboard_arrow_right</i>
-          </button>
-        </div>
+    <div class="col s12">
+      <!-- Кнопки управления каруселью -->
+      <div class="center">
+        <a class="btn" @click="prevCard">Назад <i class="material-icons left">keyboard_arrow_left</i></a>
+        <span style="margin: 0 10px;">{{ currentCard }} / {{ cards.length }}</span>
+        <a class="btn" @click="nextCard">Вперед<i class="material-icons right">keyboard_arrow_right</i></a>
       </div>
     </div>
   </div>
@@ -61,20 +45,19 @@ export default {
         fullWidth: true,
       });
     },
-    PrevCard() {
-      
+    prevCard() {
       this.currentCard = this.currentCard - 1;
       if (this.currentCard === 0) {
         this.currentCard = 1;
-        return
+        return;
       }
       this.carousel.prev();
     },
-    NextCard() {
+    nextCard() {
       this.currentCard = this.currentCard + 1;
       if (this.currentCard === this.cards.length + 1) {
         this.currentCard = 4;
-        return
+        return;
       }
       this.carousel.next();
     },

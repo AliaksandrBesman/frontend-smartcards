@@ -1,35 +1,33 @@
 <template>
-  <div>
-    <h2>Home page</h2>
-    <div class="card-container">
-      <CardList :cards="cards" />
-    </div>
-  </div>
   <div class="row">
-    <div class="col s3 offset-s3">
-      <button
-        class="btn waves-effect waves-light"
-        type="submit"
-        name="action"
-       @click="this.$router.push('/test')"
-      >
-        Тест
-      </button>
-    </div>
-    <div class="col s3"></div>
-    <div class="col s3">
-      <button
-        class="btn waves-effect waves-light"
-        type="submit"
-        name="action"
-        @click="showStatistics = !showStatistics"
-      >
-        Статистика
-      </button>
+    <div class="col s12">
+      <!-- Информация о модуле -->
+      <div>
+        <h2>{{ moduleName }}</h2>
+        <p>Тема: {{ theme }}</p>
+        <p>Автор: {{ author }}</p>
+      </div>
     </div>
   </div>
-  <Statistics v-if="showStatistics"/>
-  <Comments/>
+
+  <CardList :cards="cards" />
+
+  <div class="row">
+    <div class="col s6">
+      <!-- Кнопка "Тест" -->
+      <div class="center">
+        <a class="btn" @click="this.$router.push('/test')">Тест</a>
+      </div>
+    </div>
+    <div class="col s6">
+      <!-- Кнопка "Статистика" -->
+      <div class="center">
+        <a class="btn" @click="showStatistics = !showStatistics">Статистика</a>
+      </div>
+    </div>
+  </div>
+  <Statistics v-if="showStatistics" />
+  <Comments />
 </template>
 
 <script>
@@ -40,21 +38,33 @@ import Comments from "@/components/cards/Comments";
 export default {
   data() {
     return {
+      moduleName: "Название модуля",
+      theme: "Тема модуля",
+      author: "Автор модуля",
       cards: [
         {
           id: 1123123,
+          name: "Задача 1",
+          description: "Описание задачи 1",
+          number: 1,
           question: "Question 1",
           answer: "Answer 1",
           flipped: false,
         },
         {
           id: 1123124,
+          name: "Задача 2",
+          description: "Описание задачи 2",
+          number: 2,
           question: "Question 2",
           answer: "Answer 2",
           flipped: false,
         },
         {
           id: 1123125,
+          name: "Задача 3",
+          description: "Описание задачи 3",
+          number: 3,
           question: "Question 3",
           answer: "Answer 3",
           flipped: false,
@@ -72,7 +82,7 @@ export default {
   components: {
     CardList,
     Statistics,
-    Comments
+    Comments,
   },
 };
 </script>

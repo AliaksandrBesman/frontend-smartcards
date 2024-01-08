@@ -25,7 +25,7 @@
     <div class="row">
       <div
         class="col s12 m6 l4"
-        v-for="(course, index) in filteredCourses"
+        v-for="(course, index) in filteredModules"
         :key="index"
       >
         <div class="card">
@@ -45,72 +45,41 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
   data() {
     return {
-      courses: [
-        {
-          id: 1,
-          title: "Курс 1",
-          topic: "Тема 1",
-          description: "Описание курса 1",
-        },
-        {
-          id: 2,
-          title: "Курс 2",
-          topic: "Тема 2",
-          description: "Описание курса 2",
-        },
-        {
-          id: 3,
-          title: "Курс 3",
-          topic: "Тема 1",
-          description: "Описание курса 3",
-        },
-        {
-          id: 4,
-          title: "Курс 4",
-          topic: "Тема 3",
-          description: "Описание курса 4",
-        },
-        // Добавьте больше курсов при необходимости
-      ],
-      topics: [
-        { id: 1, name: "Тема 1" },
-        { id: 2, name: "Тема 2" },
-        { id: 3, name: "Тема 3" },
-        // Добавьте больше тем при необходимости
-      ],
       selectedTopic: "",
       sortOrder: "asc",
       searchQuery: "",
     };
   },
   computed: {
-    filteredCourses() {
-      let courses = this.courses;
+     ...mapGetters(['modules','topics']),
+    filteredModules() {
+      let modules = this.modules;
       if (this.selectedTopic) {
-        courses = courses.filter(
+        modules = modules.filter(
           (course) => course.topic === this.topics.find(topic => topic.id === this.selectedTopic).name
         );
       }
       if (this.searchQuery) {
-        courses = courses.filter((course) =>
+        modules = modules.filter((course) =>
           course.title.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
       }
       if (this.sortOrder === "asc") {
-        courses = courses.sort((a, b) => a.title.localeCompare(b.title));
+        modules = modules.sort((a, b) => a.title.localeCompare(b.title));
       } else {
-        courses = courses.sort((a, b) => b.title.localeCompare(a.title));
+        modules = modules.sort((a, b) => b.title.localeCompare(a.title));
       }
-      return courses;
+      return modules;
     },
   },
   mounted() {
     M.FormSelect.init(this.$refs.select_filter_id);
     M.FormSelect.init(this.$refs.select_sorter_id);
-    M.updateTextFields();
+    setTimeout(()=>{M.updateTextFields()},0)
   },
 };
 </script>

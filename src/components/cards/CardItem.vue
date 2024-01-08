@@ -1,10 +1,10 @@
 <template>
-<a class="carousel-item">
-  <div class="card" :class="{ flipped: card.flipped }" @click="flipCard">
+<div class="carousel-item">
+  <div class="card center-align" :class="{ flipped: card.flipped }" @click="flipCard">
     <div class="front">{{ card.question }}</div>
     <div class="back">{{ card.answer }}</div>
   </div>
-  </a>
+  </div>
 </template>
 
 <script>
@@ -26,7 +26,7 @@ export default {
 <style>
 .card {
 
-  height: 200px;
+  height: 400px;
   margin: 10px;
   perspective: 1000px;
   transition: transform 0.6s;

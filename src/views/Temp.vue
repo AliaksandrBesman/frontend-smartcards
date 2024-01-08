@@ -1,44 +1,91 @@
 <template>
   <div>
-    <h2>Курсы</h2>
-    <div class="row">
-      <div class="input-field col s12 m4">
-        <select v-model="selectedTopic" ref="select_filter_id">
-          <option value="" >Выберите тему курса</option>
-          <option v-for="topic in topics" :key="topic.id" :value="topic.id">
-            {{ topic.name }}
-          </option>
-        </select>
-        <label>Тема курса</label>
-      </div>
-      <div class="input-field col s12 m4">
-        <select v-model="sortOrder" ref="select_sorter_id">
-          <option value="asc">По возрастанию</option>
-          <option value="desc">По убыванию</option>
-        </select>
-        <label>Сортировка</label>
-      </div>
-      <div class="input-field col s12 m4">
-        <input type="text" v-model="searchQuery" placeholder="Поиск курса" />
-      </div>
-    </div>
-    <div class="row">
-      <div
-        class="col s12 m6 l4"
-        v-for="(course, index) in filteredCourses"
-        :key="index"
-      >
-        <div class="card">
-          <div class="card-content">
-            <span class="card-title">{{ course.title }}</span>
-            <p>{{ course.description }}</p>
+    <h1>Users</h1>
+    <button class="btn" @click="editUser(index)">Create</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Login</th>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Surname</th>
+          <th>Patronymic</th>
+          <th>Faculty</th>
+          <th>Department</th>
+          <th>Specialization</th>
+          <th>Course</th>
+          <th>Group</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in users" :key="index">
+          <td>{{ user.login }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.surname }}</td>
+          <td>{{ user.patronymic }}</td>
+          <td>{{ user.faculty }}</td>
+          <td>{{ user.department }}</td>
+          <td>{{ user.specialization }}</td>
+          <td>{{ user.course }}</td>
+          <td>{{ user.group }}</td>
+          <td>
+            <button class="btn" @click="editUser(index)">Edit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+<!-- Модальное окно для редактирования пользователя -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <h4>Edit User</h4>
+        <form>
+          <div class="input-field">
+            <input id="login" type="text" class="validate" v-model="editingUser.login">
+            <label for="login">Login</label>
           </div>
-          <div class="card-action">
-            <router-link to="/" class="waves-effect waves-light btn"
-              >Перейти на курс</router-link
-            >
+          <div class="input-field">
+            <input id="role" type="text" class="validate" v-model="editingUser.role">
+            <label for="role">Role</label>
           </div>
-        </div>
+          <div class="input-field">
+            <input id="name" type="text" class="validate" v-model="editingUser.name">
+            <label for="name">Name</label>
+          </div>
+          <div class="input-field">
+            <input id="surname" type="text" class="validate" v-model="editingUser.surname">
+            <label for="surname">Surname</label>
+          </div>
+          <div class="input-field">
+            <input id="patronymic" type="text" class="validate" v-model="editingUser.patronymic">
+            <label for="patronymic">Patronymic</label>
+          </div>
+          <div class="input-field">
+            <input id="faculty" type="text" class="validate" v-model="editingUser.faculty">
+            <label for="faculty">Faculty</label>
+          </div>
+          <div class="input-field">
+            <input id="department" type="text" class="validate" v-model="editingUser.department">
+            <label for="department">Department</label>
+          </div>
+          <div class="input-field">
+            <input id="specialization" type="text" class="validate" v-model="editingUser.specialization">
+            <label for="specialization">Specialization</label>
+          </div>
+          <div class="input-field">
+            <input id="course" type="text" class="validate" v-model="editingUser.course">
+            <label for="course">Course</label>
+          </div>
+          <div class="input-field">
+            <input id="group" type="text" class="validate" v-model="editingUser.group">
+            <label for="group">Group</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="center"><button class="btn" @click="saveUser">Save</button></div>
       </div>
     </div>
   </div>
@@ -48,73 +95,75 @@
 export default {
   data() {
     return {
-      courses: [
+      users: [
         {
-          id: 1,
-          title: "Курс 1",
-          topic: "Тема 1",
-          description: "Описание курса 1",
+          login: 'user123',
+          role: 'ученик',
+          name: 'Иван',
+          surname: 'Иванов',
+          patronymic: 'Иванович',
+          faculty: 'Информационных технологий',
+          department: 'Программной инженерии',
+          specialization: 'Информационные системы и технологии',
+          course: 3,
+          group: 'ИСТ-32'
         },
         {
-          id: 2,
-          title: "Курс 2",
-          topic: "Тема 2",
-          description: "Описание курса 2",
+          login: 'teacher456',
+          role: 'учитель',
+          name: 'Елена',
+          surname: 'Петрова',
+          patronymic: 'Александровна',
+          faculty: 'Педагогический',
+          department: 'Иностранных языков',
+          specialization: 'Английский язык',
+          course: null,
+          group: null
         },
         {
-          id: 3,
-          title: "Курс 3",
-          topic: "Тема 1",
-          description: "Описание курса 3",
-        },
-        {
-          id: 4,
-          title: "Курс 4",
-          topic: "Тема 3",
-          description: "Описание курса 4",
-        },
-        // Добавьте больше курсов при необходимости
+          login: 'student789',
+          role: 'ученик',
+          name: 'Алексей',
+          surname: 'Смирнов',
+          patronymic: 'Владимирович',
+          faculty: 'Экономический',
+          department: 'Менеджмента',
+          specialization: 'Менеджмент организации',
+          course: 2,
+          group: 'МО-21'
+        }
       ],
-      topics: [
-        { id: 1, name: "Тема 1" },
-        { id: 2, name: "Тема 2" },
-        { id: 3, name: "Тема 3" },
-        // Добавьте больше тем при необходимости
-      ],
-      selectedTopic: "",
-      sortOrder: "asc",
-      searchQuery: "",
-    };
+      editingUser: {}
+    }
   },
-  computed: {
-    filteredCourses() {
-      let courses = this.courses;
-      if (this.selectedTopic) {
-        courses = courses.filter(
-          (course) => course.topic === this.topics.find(topic => topic.id === this.selectedTopic).name
-        );
-      }
-      if (this.searchQuery) {
-        courses = courses.filter((course) =>
-          course.title.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
-      }
-      if (this.sortOrder === "asc") {
-        courses = courses.sort((a, b) => a.title.localeCompare(b.title));
-      } else {
-        courses = courses.sort((a, b) => b.title.localeCompare(a.title));
-      }
-      return courses;
-    },
-  },
-  mounted() {
-    M.FormSelect.init(this.$refs.select_filter_id);
-    M.FormSelect.init(this.$refs.select_sorter_id);
-    M.updateTextFields();
-  },
-};
-</script>
+  methods: {
+    editUser(index) {
+      // Заполнение формы данными пользователя для редактирования
+      this.editingUser = Object.assign({}, this.users[index]);
 
-<style>
-/* Дополнительные стили могут быть добавлены здесь */
-</style>
+      // Открытие модального окна
+      const modal = document.querySelector('.modal');
+      const instance = M.Modal.getInstance(modal);
+      instance.open();
+      setTimeout(()=>{M.updateTextFields()},0)
+    },
+    saveUser() {
+      // Обработка сохранения изменений
+      // Например, можно найти индекс пользователя в массиве и заменить его на новый объект
+      const index = this.users.findIndex(user => user.login === this.editingUser.login);
+      this.users.splice(index, 1, this.editingUser);
+
+      // Закрытие модального окна
+      const modal = document.querySelector('.modal');
+      const instance = M.Modal.getInstance(modal);
+      instance.close();
+    }
+  },
+    mounted() {
+    // Инициализация модального окна
+    const modal = document.querySelector('.modal');
+    M.Modal.init(modal);
+    setTimeout(()=>{M.updateTextFields()},0)
+  }
+}
+</script>

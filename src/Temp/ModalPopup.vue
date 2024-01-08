@@ -139,7 +139,7 @@ export default {
     M.FormSelect.init(this.$refs.select_specialty_id);
     M.FormSelect.init(this.$refs.select_group_id);
     M.FormSelect.init(this.$refs.select_student_id);
-    M.updateTextFields();
+    setTimeout(()=>{M.updateTextFields()},0)
   },
   methods: {
     setSelectedModule(module) {
