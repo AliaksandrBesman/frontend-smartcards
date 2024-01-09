@@ -56,7 +56,7 @@ export default {
     nextCard() {
       this.currentCard = this.currentCard + 1;
       if (this.currentCard === this.cards.length + 1) {
-        this.currentCard = 4;
+        this.currentCard = this.cards.length;
         return;
       }
       this.carousel.next();

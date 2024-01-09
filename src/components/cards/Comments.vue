@@ -1,59 +1,114 @@
 <template>
   <div>
     <h2>Комментарии</h2>
-    <div class="row">
+    <div class="row" v-if="user?.roleId == 3">
       <form class="col s12" @submit.prevent="addComment">
-        <div class="input-field col s6">
-          <input id="name" type="text" v-model="newComment.name" class="validate">
-          <label for="name">Имя</label>
-        </div>
-        <div class="input-field col s6">
-          <input id="comment" type="text" v-model="newComment.text" class="validate">
+        <div class="input-field col s12">
+          <textarea
+            id="comment"
+            class="materialize-textarea"
+            v-model="newComment.text"
+          ></textarea>
+          <!-- <input id="comment" type="text" v-model="newComment.text" class="validate"> -->
           <label for="comment">Комментарий</label>
         </div>
-        <button class="btn waves-effect waves-light" type="submit" name="action">Отправить
+        <button
+          class="btn waves-effect waves-light"
+          type="submit"
+          name="action"
+        >
+          Отправить
           <i class="material-icons right">send</i>
         </button>
       </form>
     </div>
-    <ul class="collection">
-      <li class="collection-item" v-for="(comment, index) in comments" :key="index">
-        <span class="title">{{ comment.name }}</span>
-        <p>{{ comment.text }}</p>
+
+    <ul class="collection" v-if="filteredComment?.length">
+      <li
+        class="collection-item"
+        v-for="(comment, index) in filteredComment"
+        :key="index"
+      >
+        <span class="title">{{ comment.userId }}</span>
+        <p>{{ comment.comment1 }}</p>
+        <div v-if="user?.roleId == 1">
+          <button
+            class="btn waves-effect waves-light"
+            v-if="comment.hidden"
+            @click="ShowHideComment('show', comment)"
+          >
+            Открыть комментарий
+          </button>
+          <button
+            class="btn waves-effect waves-light"
+            v-else
+            @click="ShowHideComment('hide', comment)"
+          >
+            Скрыть комментарий
+          </button>
+        </div>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
-      comments: [
-        { id: 1, name: 'Иван', text: 'Комментарий 1' },
-        { id: 2, name: 'Мария', text: 'Комментарий 2' },
-        { id: 3, name: 'Анна', text: 'Комментарий 3' }
-        // Добавьте больше комментариев при необходимости
-      ],
       newComment: {
-        name: '',
-        text: ''
-      }
+        name: "",
+        text: "",
+      },
+      showComments: true,
     };
   },
   methods: {
-    addComment() {
-      if (this.newComment.name && this.newComment.text) {
-        this.comments.push({
-          id: this.comments.length + 1,
-          name: this.newComment.name,
-          text: this.newComment.text
-        });
-        this.newComment.name = '';
-        this.newComment.text = '';
+    ...mapActions([
+      "fetctGetCommentsBySubjectId",
+      "fetchAddNewComment",
+      "fetchPutComment",
+    ]),
+    async addComment() {
+      if (this.newComment.text) {
+        const newComment = {
+          userId: this.user.id,
+          subjectId: this.$route.params.id,
+          comment1: this.newComment.text,
+        };
+        await this.fetchAddNewComment(newComment);
+        this.newComment.name = "";
+        this.newComment.text = "";
+        await this.fetctGetCommentsBySubjectId(this.$route.params.id);
       }
-    }
-  }
+    },
+    async ShowHideComment(type, comment) {
+      console.log(type);
+      if (type == "show") {
+        comment.hidden = false;
+      } else {
+        comment.hidden = true;
+      }
+      console.log(comment);
+      this.fetchPutComment(comment);
+    },
+  },
+  computed: {
+    ...mapGetters(["user", "subjectComments"]),
+    filteredComment() {
+      if (this.user?.roleId == 1) {
+        return this.subjectComments;
+      } else {
+        return this.subjectComments?.filter(
+          comment=> comment.hidden == false
+        );
+      }
+    },
+  },
+  async mounted() {
+    await this.fetctGetCommentsBySubjectId(this.$route.params.id);
+  },
 };
 </script>
 

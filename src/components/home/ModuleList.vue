@@ -1,10 +1,11 @@
 <template>
   <div>
     <h2>Курсы</h2>
-    <div class="row">
+    <button class="btn" @click="createModule" v-if="user?.roleId == 2">Создать</button>
+    <div class="row" v-if="grantedModules?.length">
       <div class="input-field col s12 m4">
         <select v-model="selectedTopic" ref="select_filter_id">
-          <option value="" >Выберите тему курса</option>
+          <option value="">Выберите тему курса</option>
           <option v-for="topic in topics" :key="topic.id" :value="topic.id">
             {{ topic.name }}
           </option>
@@ -22,64 +23,189 @@
         <input type="text" v-model="searchQuery" placeholder="Поиск курса" />
       </div>
     </div>
-    <div class="row">
+    <div class="row" v-if="grantedModules?.length">
       <div
         class="col s12 m6 l4"
-        v-for="(course, index) in filteredModules"
+        v-for="(course, index) in filteredGrantedModules"
         :key="index"
       >
         <div class="card">
           <div class="card-content">
-            <span class="card-title">{{ course.title }}</span>
-            <p>{{ course.description }}</p>
+            <span class="card-title">{{ course.subject }}</span>
+            <p>{{ course.title }}</p>
           </div>
           <div class="card-action">
-            <router-link to="/module" class="waves-effect waves-light btn"
+            <router-link
+              :to="'/module/' + course.id"
+              class="waves-effect waves-light btn"
               >Перейти на курс</router-link
             >
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Модальное окно для создания теста -->
+    <div id="createModal" class="modal">
+      <div class="modal-content">
+        <h4>Create Test</h4>
+        <form>
+          <div class="input-field">
+            <input
+              id="testName"
+              type="text"
+              class="validate"
+              v-model="newTest.title"
+            />
+            <label for="testName">Test Title</label>
+          </div>
+          <div class="input-field">
+            <input
+              id="testSubject"
+              type="text"
+              class="validate"
+              v-model="newTest.subject"
+            />
+            <label for="testSubject">Test Subject</label>
+            <div class="input-field">
+              <textarea
+                id="testQuest"
+                class="materialize-textarea"
+                v-model="question_answer.question"
+              ></textarea>
+              <label for="testQuest">Test Question</label>
+            </div>
+            <div class="input-field">
+              <input
+                id="testAnswer"
+                type="text"
+                class="validate"
+                v-model="question_answer.answer"
+              />
+              <label for="testAnswer">Test Answer</label>
+            </div>
+            <button
+              class="waves-effect waves-light btn"
+              @click.prevent="addTestCard"
+            >
+              Добавить
+            </button>
+            <ul class="collection" v-if="questions_answers?.length">
+              <li
+                class="collection-item"
+                v-for="(qa, index) in questions_answers"
+                :key="index"
+              >
+                <span class="title">{{ qa.question }}</span>
+                <p>{{ qa.answer }}</p>
+              </li>
+            </ul>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="text-align: center">
+        <a @click.prevent="saveModule" class="modal-close waves-effect waves-green btn-flat"
+          >Create</a
+        >
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
       selectedTopic: "",
       sortOrder: "asc",
       searchQuery: "",
+      newTest: {},
+      question_answer: {},
+      questions_answers: [],
     };
   },
+  methods: {
+    ...mapActions([
+      "fetchGrantedModulesByUserId",
+      "fetchGrantedSubjectLessonByCreatedById",
+      "fetchPostSubjectLesson",
+    ]),
+    createModule() {
+      this.questions_answers = [];
+      this.question_answer = {};
+      // Открытие модального окна
+      const modal = document.querySelector(".modal");
+      const instance = M.Modal.getInstance(modal);
+      instance.open();
+      setTimeout(() => {
+        M.updateTextFields();
+      }, 0);
+    },
+    addTestCard() {
+      this.questions_answers.push({...this.question_answer});
+    },
+    saveModule() {
+      const subjectLesson = {
+        subjectLesson: {
+          subject: this.newTest.subject,
+          title: this.newTest.title,
+          createdById: this.user.id
+        },
+        qanA: this.questions_answers,
+      };
+      console.log(subjectLesson);
+       this.fetchPostSubjectLesson(subjectLesson)
+    },
+  },
   computed: {
-     ...mapGetters(['modules','topics']),
-    filteredModules() {
-      let modules = this.modules;
+    ...mapGetters(["grantedModules", "user"]),
+    filteredGrantedModules() {
+      let grantedModules = this.grantedModules;
       if (this.selectedTopic) {
-        modules = modules.filter(
-          (course) => course.topic === this.topics.find(topic => topic.id === this.selectedTopic).name
+        grantedModules = grantedModules.filter(
+          (course) =>
+            course.subject ===
+            this.topics.find((topic) => topic.id === this.selectedTopic).name
         );
       }
       if (this.searchQuery) {
-        modules = modules.filter((course) =>
+        grantedModules = grantedModules.filter((course) =>
           course.title.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
       }
       if (this.sortOrder === "asc") {
-        modules = modules.sort((a, b) => a.title.localeCompare(b.title));
+        grantedModules = grantedModules.sort((a, b) =>
+          a.title.localeCompare(b.title)
+        );
       } else {
-        modules = modules.sort((a, b) => b.title.localeCompare(a.title));
+        grantedModules = grantedModules.sort((a, b) =>
+          b.title.localeCompare(a.title)
+        );
       }
-      return modules;
+      return grantedModules;
+    },
+    topics() {
+      return Array.from(
+        new Set(this.grantedModules.map((item) => item.subject))
+      ).map((topic, index) => ({ id: index + 1, name: topic }));
     },
   },
-  mounted() {
-    M.FormSelect.init(this.$refs.select_filter_id);
-    M.FormSelect.init(this.$refs.select_sorter_id);
-    setTimeout(()=>{M.updateTextFields()},0)
+  async mounted() {
+    if (this.user?.roleId == 2) {
+      await this.fetchGrantedSubjectLessonByCreatedById(this.user.id);
+    } else {
+      console.log("await this.fetchGrantedModulesByUserId(this.user.id);" + "await this.fetchGrantedModulesByUserId(this.user.id);")
+      await this.fetchGrantedModulesByUserId(this.user.id);
+    }
+
+    await setTimeout(() => {
+      const modals = document.querySelectorAll(".modal");
+      M.Modal.init(modals);
+      M.FormSelect.init(this.$refs.select_filter_id);
+      M.FormSelect.init(this.$refs.select_sorter_id);
+      M.updateTextFields();
+    }, 0);
   },
 };
 </script>

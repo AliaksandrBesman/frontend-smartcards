@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import {mapActions} from 'vuex'
 export default {
   name: "Login",
   data() {
@@ -55,7 +56,7 @@ export default {
   },
   methods: {
     ...mapActions(["fetchLogin"]),
-    loginUser() {
+  async  loginUser() {
 
       const userInfo = {
         login: this.login,
@@ -63,9 +64,11 @@ export default {
       };
 
       try {
-        this.fetchLogin(userInfo);
-        this.$router.push("/");
-      } catch (e) {}
+       await this.fetchLogin(userInfo);
+       await this.$router.push("/");
+      } catch (e) {
+
+      }
     },
   },
   mounted() {

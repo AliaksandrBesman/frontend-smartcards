@@ -1,13 +1,15 @@
 <template>
-  <div class="row">
-    <div class="col s12">
-      <div class="card">
-        <div class="card-content">
-          <span class="card-title">{{ question }}</span>
-          <div class="input-field">
-            <textarea id="answer" class="materialize-textarea" v-model="answer"></textarea>
-            <label for="answer">Answer</label>
-          </div>
+  <div class="col s12">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ question }}</span>
+        <div class="input-field">
+          <textarea
+            id="answer"
+            class="materialize-textarea"
+            v-model="answer"
+          ></textarea>
+          <label for="answer">Answer</label>
         </div>
       </div>
     </div>
@@ -17,12 +19,17 @@
 <script>
 export default {
   props: {
-    question: String
+    question: String,
   },
   data() {
     return {
-      answer: ''
-    }
-  }
-}
+      answer: "",
+    };
+  },
+  mounted() {
+    setTimeout(() => {
+      M.updateTextFields();
+    }, 0);
+  },
+};
 </script>

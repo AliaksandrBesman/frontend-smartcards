@@ -17,14 +17,14 @@ const routes = [
     component: () => import('../views/Login.vue')
   },
   {
-    path: '/module',
+    path: '/module/:id',
     name: 'module',
     meta: {layout: 'main', auth:true},
 
     component: () => import('../views/Module.vue')
   },
   {
-    path: '/test',
+    path: '/test/:id',
     name: 'test',
     meta: {layout: 'main', auth:true},
 
@@ -45,6 +45,20 @@ const routes = [
     component: () => import('../views/Users.vue')
   },
   {
+    path: '/review_test/:id',
+    name: 'review_test',
+    meta: {layout: 'main', auth:true},
+
+    component: () => import('../views/ReviewTest.vue')
+  },
+  {
+    path: '/check_test/:m_id/:us_id',
+    name: 'check_test',
+    meta: {layout: 'main', auth:true},
+
+    component: () => import('../views/CheckTest.vue')
+  },
+  {
     path: '/temp',
     name: 'temp',
     meta: {layout: 'main', auth:true},
@@ -59,10 +73,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to,from,next)=>{
-  console.log("BeforeEach");
-  console.log(store.getters.getJwtInfo);
-
-  const activeUser = store.getters.getUser
+  const activeUser = store.getters.user
   const reqireAuth = to.matched.some(record=>record.meta.auth)
   if(reqireAuth && !activeUser){
     next('/login')

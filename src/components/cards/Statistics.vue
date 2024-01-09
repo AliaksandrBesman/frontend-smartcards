@@ -1,39 +1,49 @@
 <template>
-        <table>
-        <thead>
-          <tr>
-              <th>Name</th>
-              <th>Item Name</th>
-              <th>Item Price</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>Alvin</td>
-            <td>Eclair</td>
-            <td>$0.87</td>
-          </tr>
-          <tr>
-            <td>Alan</td>
-            <td>Jellybean</td>
-            <td>$3.76</td>
-          </tr>
-          <tr>
-            <td>Jonathan</td>
-            <td>Lollipop</td>
-            <td>$7.00</td>
-          </tr>
-        </tbody>
-      </table>
+  <h4>Cтуденты выполнившие модуль</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Логин</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Отчество</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(user, index) in userCompletedCourse" :key="index">
+        <td>{{ user.login }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.surname }}</td>
+        <td>{{ user.secondName }}</td>
+        <td>
+          <button class="btn" @click="$router.push('/check_test/' + this.$route.params.id + '/' + user.id)">Проверить</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 export default {
+  methods: { ...mapActions(["fetchGetUsersCOmpletedTesByModuleId"]) },
+  computed: {
+    ...mapGetters([
+      "c_module",
+      "user",
+      "qanA",
+      "testUserAnsw",
+      "notGrantedUsers",
+      "userCompletedCourse"
+    ]),
+  },
+  async mounted() {
+    await this.fetchGetUsersCOmpletedTesByModuleId(this.$route.params.id)
 
-}
+  },
+};
 </script>
 
 <style>
-
 </style>

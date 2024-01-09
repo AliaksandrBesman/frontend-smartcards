@@ -2,102 +2,226 @@ import axios from 'axios'
 
 export default {
     state: {
-        users: JSON.parse(localStorage.getItem('users') || '[]'),
-        user: {
-            login: 'user123',
-            role: 'ученик',
-            name: 'Иван',
-            surname: 'Иванов',
-            patronymic: 'Иванович',
-            faculty: 'Информационных технологий',
-            department: 'Программной инженерии',
-            specialization: 'Информационные системы и технологии',
-            course: 3,
-            group: 'ИСТ-32'
-        },
-        modules: [
-            {
-                id: 1,
-                title: "Курс 1",
-                topic: "Тема 1",
-                description: "Описание курса 1",
-            },
-            {
-                id: 2,
-                title: "Курс 2",
-                topic: "Тема 2",
-                description: "Описание курса 2",
-            },
-            {
-                id: 3,
-                title: "Курс 3",
-                topic: "Тема 1",
-                description: "Описание курса 3",
-            },
-            {
-                id: 4,
-                title: "Курс 4",
-                topic: "Тема 3",
-                description: "Описание курса 4",
-            },
-            // Добавьте больше курсов при необходимости
-        ],
-        topics: [
-            { id: 1, name: "Тема 1" },
-            { id: 2, name: "Тема 2" },
-            { id: 3, name: "Тема 3" },
-            // Добавьте больше тем при необходимости
-        ],
+        users: null,
+        grantedModules: null,
+        module: null,
+        qanA: null,
+        testUserAnsw: null,
+        subjectComments: null,
     },
     mutations: {
-        createUser(state, user) {
-            // Check if the item already exists in the array
-            const existingItem = state.users.find(u => u.id === user.id);
-            console.log(existingItem)
-            if (!!!existingItem) {
-                console.log("Hello Not")
-                state.users.push(user)
-                localStorage.setItem('users', JSON.stringify(state.users))
-            }
+        setGrantedModules(state, grantedModules) {
+            state.grantedModules = grantedModules;
+        },
+        setModule(state, module) {
+            state.module = module;
+        },
+        setQanA(state, qanA) {
+            state.qanA = qanA;
+        },
+        setTestUserAnsw(state, testUserAnsw) {
+            state.testUserAnsw = testUserAnsw;
+        },
+        setSubjectComments(state, subjectComments) {
+            state.subjectComments = subjectComments;
+        },
+        setUsers(state, users) {
+            console.log("setUsers")
+            console.log(users)
+            state.users = users;
+        },
 
-        },
-        updateUser(state, user) {
-            const index = state.users.findIndex(u => u.id === user.id);
-            state.users.splice(index, 1, user);
-            localStorage.setItem('users', JSON.stringify(state.users));
-
-        },
-        setUser(state, user) {
-            state.user = user;
-        },
 
     },
     actions: {
-        createUser(ctx, user) {
-            console.log("createUser")
-            ctx.commit('createUser', user)
+        async JustTestMRemoveIT(ctx, userId) {
+            debugger
+            console.log(userId)
         },
-        updateUser(ctx, user) {
-            console.log("createUser")
-            ctx.commit('updateUser', user)
+        async fetchGrantedModulesByUserId(ctx, userId) {
+            await axios
+                .get(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/GetGrantedSubjectLessonByUserId/" + userId)
+                .then((response) => {
+                    console.log(response.data);
+                    const grantedModules = response.data;
+                    setTimeout(() => {
+                        ctx.commit('setGrantedModules', grantedModules)
+                    }, 0)
+                })
         },
-        async fetchLogin(ctx, userLogin) {
-            try {
-                const index = this.users.findIndex(user => user.login === this.editingUser.login);
-                const jwtToken = response.data;
-                ctx.commit('setUser', jwtToken)
+        async fetchGrantedSubjectLessonByCreatedById(ctx, userId) {
+            await axios
+                .get(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/GetGrantedSubjectLessonByCreatedById/" + userId)
+                .then((response) => {
+                    console.log(response.data);
+                    const grantedModules = response.data;
+                    setTimeout(() => {
+                        ctx.commit('setGrantedModules', grantedModules)
+                    }, 0)
+                })
+        },
 
-                console.log("EndLogin");
+
+        async fetchModuleById(ctx, moduleId) {
+            await axios
+                .get(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/" + moduleId)
+                .then((response) => {
+                    console.log(response.data);
+                    const module = response.data;
+                    setTimeout(() => {
+                        ctx.commit('setModule', module)
+                    }, 0)
+                })
+        },
+        async fetchQanABySubLId(ctx, moduleId) {
+            await axios
+                .get(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/GetQuestionAnswerBySubLId/" + moduleId)
+                .then((response) => {
+                    console.log(response.data);
+                    const qanA = response.data;
+                    setTimeout(() => {
+                        ctx.commit('setQanA', qanA)
+                    }, 0)
+                })
+        },
+        async fetchSaveTest(ctx, testData) {
+            try {
+                await axios
+                    .post(process.env.VUE_APP_BACKEND_URL + "/api/TestAnswers", testData)
+                    .then((response) => {
+                        console.log(response.data);
+                    })
             } catch (e) {
-                console.log("Error");
+                console.log("fetchLogin Error:");
+                console.log(e);
                 throw e
             }
         },
+        async fetchGetTestResultByUserAndSubId(ctx, user_and_subj_id) {
+
+            try {
+                await axios
+                    .post(process.env.VUE_APP_BACKEND_URL + "/api/TestAnswers/PostGetTestResultByUserAndSubId", user_and_subj_id)
+                    .then((response) => {
+                        console.log(response.data);
+                        ctx.commit('setTestUserAnsw', response.data)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetctGetCommentsBySubjectId(ctx, subjectId) {
+            await axios
+                .get(process.env.VUE_APP_BACKEND_URL + "/api/Comments/GetCommentsBySubjectId/" + subjectId)
+                .then((response) => {
+                    setTimeout(() => {
+                        ctx.commit('setSubjectComments', response.data)
+                    }, 0)
+                })
+        },
+        async fetchAddNewComment(ctx, newCommwnr) {
+            try {
+                await axios
+                    .post(process.env.VUE_APP_BACKEND_URL + "/api/Comments", newCommwnr)
+                    .then((response) => {
+
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchGetAllUsers(ctx) {
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/Users")
+                    .then((response) => {
+                        setTimeout(() => {
+                            ctx.commit('setUsers', response.data)
+                        }, 0)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchPutComment(ctx, comment) {
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .put(process.env.VUE_APP_BACKEND_URL + "/api/Comments/" + comment.id, comment)
+                    .then((response) => {
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchPutTestAnswer(ctx, testAnswer) {
+
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .put(process.env.VUE_APP_BACKEND_URL + "/api/TestAnswers/" + testAnswer.id, testAnswer)
+                    .then((response) => {
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchPostSubjectLesson(ctx, subjectLesson) {
+
+            try {
+
+                let subjectLessonsId = null;
+                await axios.
+                    post(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons", subjectLesson.subjectLesson)
+                    .then((response) => {
+
+                        subjectLessonsId = response.data.id
+                    })
+
+                subjectLesson.qanA.forEach(element => {
+
+                    element.subjectLessonId = subjectLessonsId
+                });
+                subjectLesson.qanA.forEach(element => {
+
+
+                    axios.post(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers", element)
+                        .then((response) => {
+
+                        })
+                });
+
+
+            } catch (e) {
+
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+
     },
     getters: {
-        user: s => s.user,
         users: s => s.users,
-        modules: s => s.modules,
         topics: s => s.topics,
+        grantedModules: s => s.grantedModules,
+        c_module: s => s.module,
+        qanA: s => s.qanA,
+        testUserAnsw: s => s.testUserAnsw,
+        subjectComments: s => s.subjectComments,
+
+
+
     }
 }

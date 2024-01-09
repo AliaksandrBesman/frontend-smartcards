@@ -10,26 +10,27 @@
         </div>
       </div>
     </div>
-    <div class="row" v-if="qanA?.length">
+    <div class="row" v-if="testUserAnsw?.length && qanA?.length">
       <div class="col s12" :key="index" v-for="(question, index) in qanA">
         <div class="card">
           <div class="card-content">
             <span class="card-title">{{ question.question }}</span>
-            <div class="input-field">
-              <textarea
+            <div
+              class="input-field"
+              
+            >
+              <input
                 id="answer"
-                class="materialize-textarea"
-                v-model="answers[index]"
-              ></textarea>
+                type="text"
+                class="validate"
+                :class="[getAccuracy(question.id) ? 'valid' : 'invalid']"
+                :value="getAnswer(question.id)"
+                disabled
+              />
               <label for="answer">Answer</label>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s12 center">
-        <button class="btn" @click="submitAnswers">Завершить тест</button>
       </div>
     </div>
   </div>
@@ -52,39 +53,16 @@ export default {
     ...mapActions([
       "fetchModuleById",
       "fetchQanABySubLId",
-      "fetchSaveTest",
       "fetchGetTestResultByUserAndSubId",
-      "fetchPutTestAnswer",
     ]),
-    submitAnswers() {
-      if (this.testUserAnsw?.length) {
-        this.answers.forEach((answer, index) => {
-          const test_answer = {
-            id: this.testUserAnsw.find(
-              (u) =>
-                u.userId === this.user.id &&
-                u.questionId === this.qanA[index].id
-            ).id,
-            userId: this.user.id,
-            questionId: this.qanA[index].id,
-            answer: answer,
-          };
-          console.log(test_answer);
-          this.fetchPutTestAnswer(test_answer);
-          this.$router.push("/review_test/" + this.$route.params.id);
-        });
-      } else {
-        this.answers.forEach((answer, index) => {
-          const test_answer = {
-            userId: this.user.id,
-            questionId: this.qanA[index].id,
-            answer: answer,
-          };
-          console.log(test_answer);
-          this.fetchSaveTest(test_answer);
-          this.$router.push("/review_test/" + this.$route.params.id);
-        });
-      }
+    getAnswer(index) {
+      return this.testUserAnsw.find((u) => u.questionId === index).answer;
+    },
+    getAccuracy(index) {
+      return this.testUserAnsw.find((u) => u.questionId === index).accuracy;
+    },
+    showSMT(inex) {
+      return "hehehehhehe" + inex;
     },
   },
   computed: {
@@ -97,6 +75,7 @@ export default {
       userId: this.user.id,
       subjectId: this.$route.params.id,
     });
+
     await setTimeout(() => {
       M.updateTextFields();
     }, 0);
