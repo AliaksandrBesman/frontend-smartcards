@@ -1,7 +1,9 @@
 <template>
   <div>
     <h2>Курсы</h2>
-    <button class="btn" @click="createModule" v-if="user?.roleId == 2">Создать</button>
+    <button class="btn" @click="createModule" v-if="user?.roleId == 2">
+      Создать
+    </button>
     <div class="row" v-if="grantedModules?.length">
       <div class="input-field col s12 m4">
         <select v-model="selectedTopic" ref="select_filter_id">
@@ -48,17 +50,8 @@
     <!-- Модальное окно для создания теста -->
     <div id="createModal" class="modal">
       <div class="modal-content">
-        <h4>Create Test</h4>
+        <h4>Добавить модуль</h4>
         <form>
-          <div class="input-field">
-            <input
-              id="testName"
-              type="text"
-              class="validate"
-              v-model="newTest.title"
-            />
-            <label for="testName">Test Title</label>
-          </div>
           <div class="input-field">
             <input
               id="testSubject"
@@ -66,47 +59,59 @@
               class="validate"
               v-model="newTest.subject"
             />
-            <label for="testSubject">Test Subject</label>
-            <div class="input-field">
-              <textarea
-                id="testQuest"
-                class="materialize-textarea"
-                v-model="question_answer.question"
-              ></textarea>
-              <label for="testQuest">Test Question</label>
-            </div>
-            <div class="input-field">
-              <input
-                id="testAnswer"
-                type="text"
-                class="validate"
-                v-model="question_answer.answer"
-              />
-              <label for="testAnswer">Test Answer</label>
-            </div>
-            <button
-              class="waves-effect waves-light btn"
-              @click.prevent="addTestCard"
-            >
-              Добавить
-            </button>
-            <ul class="collection" v-if="questions_answers?.length">
-              <li
-                class="collection-item"
-                v-for="(qa, index) in questions_answers"
-                :key="index"
-              >
-                <span class="title">{{ qa.question }}</span>
-                <p>{{ qa.answer }}</p>
-              </li>
-            </ul>
+            <label for="testSubject">Предмет</label>
           </div>
+          <div class="input-field">
+            <input
+              id="testName"
+              type="text"
+              class="validate"
+              v-model="newTest.title"
+            />
+            <label for="testName">Описание</label>
+          </div>
+          <div class="input-field">
+            <textarea
+              id="testQuest"
+              class="materialize-textarea"
+              v-model="question_answer.question"
+            ></textarea>
+            <label for="testQuest">Вопрос</label>
+          </div>
+          <div class="input-field">
+            <input
+              id="testAnswer"
+              type="text"
+              class="validate"
+              v-model="question_answer.answer"
+            />
+            <label for="testAnswer">Ответ</label>
+          </div>
+          <button
+            class="waves-effect waves-light btn"
+            @click.prevent="addTestCard"
+          >
+            Добавить
+          </button>
+          <ul class="collection" v-if="questions_answers?.length">
+            <li
+              class="collection-item"
+              v-for="(qa, index) in questions_answers"
+              :key="index"
+            >
+              <span class="title">{{ qa.question }}</span>
+              <p>{{ qa.answer }}</p>
+            </li>
+          </ul>
         </form>
       </div>
       <div class="modal-footer" style="text-align: center">
-        <a @click.prevent="saveModule" class="modal-close waves-effect waves-green btn-flat"
-          >Create</a
+        <button
+          class="waves-effect waves-light btn modal-close"
+          @click.prevent="saveModule"
         >
+          Сохранить
+        </button>
       </div>
     </div>
   </div>
@@ -143,19 +148,19 @@ export default {
       }, 0);
     },
     addTestCard() {
-      this.questions_answers.push({...this.question_answer});
+      this.questions_answers.push({ ...this.question_answer });
     },
     saveModule() {
       const subjectLesson = {
         subjectLesson: {
           subject: this.newTest.subject,
           title: this.newTest.title,
-          createdById: this.user.id
+          createdById: this.user.id,
         },
         qanA: this.questions_answers,
       };
       console.log(subjectLesson);
-       this.fetchPostSubjectLesson(subjectLesson)
+      this.fetchPostSubjectLesson(subjectLesson);
     },
   },
   computed: {
@@ -195,7 +200,10 @@ export default {
     if (this.user?.roleId == 2) {
       await this.fetchGrantedSubjectLessonByCreatedById(this.user.id);
     } else {
-      console.log("await this.fetchGrantedModulesByUserId(this.user.id);" + "await this.fetchGrantedModulesByUserId(this.user.id);")
+      console.log(
+        "await this.fetchGrantedModulesByUserId(this.user.id);" +
+          "await this.fetchGrantedModulesByUserId(this.user.id);"
+      );
       await this.fetchGrantedModulesByUserId(this.user.id);
     }
 

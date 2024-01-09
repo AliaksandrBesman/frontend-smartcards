@@ -11,11 +11,6 @@
           <th>Фамилия</th>
           <th>Отчество</th>
           <th>Роль</th>
-          <!-- <th>Факультет</th>
-          <th>Специальность</th>
-          <th>Факультет</th>
-          <th>Курс</th>
-          <th>Группа</th> -->
           <th>Action</th>
         </tr>
       </thead>
@@ -37,7 +32,13 @@
     <!-- Модальное окно для редактирования пользователя -->
     <div id="editModal" class="modal">
       <div class="modal-content">
-        <h4>{{create_edit_key == "create"? 'Добавить пользователя': "Редактировать пользователя"}}</h4>
+        <h4>
+          {{
+            create_edit_key == "create"
+              ? "Добавить пользователя"
+              : "Редактировать пользователя"
+          }}
+        </h4>
         <form>
           <div class="input-field">
             <input
@@ -106,7 +107,13 @@
       </div>
       <div class="modal-footer">
         <div class="center">
-          <button class="btn" @click="saveUser">Save</button>
+          <button class="btn" @click="saveUser">
+            {{
+              create_edit_key == "create"
+                ? "Добавить"
+                : "Изменить"
+            }}
+          </button>
         </div>
       </div>
     </div>
