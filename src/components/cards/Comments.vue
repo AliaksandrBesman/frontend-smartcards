@@ -23,32 +23,49 @@
       </form>
     </div>
 
-    <ul class="collection" v-if="filteredComment?.length">
-      <li
-        class="collection-item"
+    <div
+      class="row"
+      v-if="filteredComment?.length && usersLeftComments?.length"
+    >
+      <div
+        class="col s12"
         v-for="(comment, index) in filteredComment"
         :key="index"
       >
-        <span class="title">{{ comment.userId }}</span>
-        <p>{{ comment.comment1 }}</p>
-        <div v-if="user?.roleId == 1">
-          <button
-            class="btn waves-effect waves-light"
-            v-if="comment.hidden"
-            @click="ShowHideComment('show', comment)"
-          >
-            Открыть комментарий
-          </button>
-          <button
-            class="btn waves-effect waves-light"
-            v-else
-            @click="ShowHideComment('hide', comment)"
-          >
-            Скрыть комментарий
-          </button>
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">{{
+              "Пользователь: " + getUserLeftCommentById(comment.userId).login
+            }}</span>
+            <div class="input-field">
+              <input
+                id="answer"
+                type="text"
+                class="validate"
+                :value="comment.comment1"
+                disabled
+              />
+            </div>
+            <div v-if="user?.roleId == 1">
+              <button
+                class="btn waves-effect waves-light"
+                v-if="comment.hidden"
+                @click="ShowHideComment('show', comment)"
+              >
+                Открыть комментарий
+              </button>
+              <button
+                class="btn waves-effect waves-light"
+                v-else
+                @click="ShowHideComment('hide', comment)"
+              >
+                Скрыть комментарий
+              </button>
+            </div>
+          </div>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,6 +86,7 @@ export default {
       "fetctGetCommentsBySubjectId",
       "fetchAddNewComment",
       "fetchPutComment",
+      "fetchGetUsersLeftCommentsByModuleId",
     ]),
     async addComment() {
       if (this.newComment.text) {
@@ -93,21 +111,28 @@ export default {
       console.log(comment);
       this.fetchPutComment(comment);
     },
+    getUserLeftCommentById(userId) {
+      return this.usersLeftComments.find((user) => user.id === userId);
+    },
   },
   computed: {
-    ...mapGetters(["user", "subjectComments"]),
+    ...mapGetters(["user", "subjectComments", "usersLeftComments"]),
     filteredComment() {
       if (this.user?.roleId == 1) {
         return this.subjectComments;
       } else {
         return this.subjectComments?.filter(
-          comment=> comment.hidden == false
+          (comment) => comment.hidden == false
         );
       }
     },
   },
   async mounted() {
     await this.fetctGetCommentsBySubjectId(this.$route.params.id);
+    await this.fetchGetUsersLeftCommentsByModuleId(this.$route.params.id);
+    await setTimeout(() => {
+      M.updateTextFields();
+    }, 0);
   },
 };
 </script>

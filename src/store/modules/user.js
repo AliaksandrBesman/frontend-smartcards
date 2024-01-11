@@ -4,7 +4,8 @@ export default {
     state: {
         userDetails: null,
         notGrantedUsers: null,
-        userCompletedCourse: null
+        userCompletedCourse: null,
+        usersLeftComments: null,
     },
     mutations: {
         setUserDetails(state, userDetails) {
@@ -16,6 +17,10 @@ export default {
         setUserCompletedCourse(state, userCompletedCourse) {
             state.userCompletedCourse = userCompletedCourse;
         },
+        setUsersLeftComments(state, usersLeftComments) {
+            state.usersLeftComments = usersLeftComments;
+        },
+
 
 
     },
@@ -104,7 +109,19 @@ export default {
                 throw e
             }
         },
-
+        async fetchGetUsersLeftCommentsByModuleId(ctx, modeuleId) {
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/Users/GetUsersLeftCommentsByModuleId/" + modeuleId)
+                    .then((response) => {
+                        ctx.commit('setUsersLeftComments', response.data)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
 
 
 
@@ -114,6 +131,8 @@ export default {
         userDetails: s => s.userDetails,
         notGrantedUsers: s => s.notGrantedUsers,
         userCompletedCourse: s => s.userCompletedCourse,
+        usersLeftComments: s => s.usersLeftComments,
+
 
     },
 

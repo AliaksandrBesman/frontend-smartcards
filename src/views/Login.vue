@@ -1,20 +1,20 @@
 <template>
   <div>
     <div class="modal-header">
-      <h4>Login</h4>
+      <h4>Вход</h4>
     </div>
     <div class="row">
       <form class="col s12">
         <div class="row">
           <div class="input-field col s12">
             <input
-              placeholder="Placeholder"
+              placeholder="Логин"
               id="login"
               type="text"
               v-model="login"
               :class="{ invalid: v$.password.$error }"
             />
-            <label for="login">Login</label>
+            <label for="login">Логин</label>
             <span
               v-if="v$.login.$error"
               class="helper-text"
@@ -30,7 +30,7 @@
               v-model="password"
               :class="{ invalid: v$.password.$error }"
             />
-            <label for="password">Password</label>
+            <label for="password">Пароль</label>
             <span
               v-if="v$.password.$error"
               class="helper-text"
@@ -44,7 +44,7 @@
       <div class="row">
         <div class="col s12">
           <button class="btn waves-effect waves-light" @click="loginUser">
-            Login
+            Войти
             <i class="material-icons right">send</i>
           </button>
         </div>
