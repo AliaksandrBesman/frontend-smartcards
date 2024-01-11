@@ -6,6 +6,7 @@ export default {
         notGrantedUsers: null,
         userCompletedCourse: null,
         usersLeftComments: null,
+        userRoles: null,
     },
     mutations: {
         setUserDetails(state, userDetails) {
@@ -20,6 +21,10 @@ export default {
         setUsersLeftComments(state, usersLeftComments) {
             state.usersLeftComments = usersLeftComments;
         },
+        setUserRoles(state, userRoles) {
+            state.userRoles = userRoles;
+        },
+
 
 
 
@@ -122,7 +127,22 @@ export default {
                 throw e
             }
         },
-
+        async fetchGetUserRoles(ctx) {
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/Users/GetUserRoles")
+                    .then((response) => {
+                        setTimeout(() => {
+                            ctx.commit('setUserRoles', response.data)
+                        }, 0)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
 
 
 
@@ -132,8 +152,7 @@ export default {
         notGrantedUsers: s => s.notGrantedUsers,
         userCompletedCourse: s => s.userCompletedCourse,
         usersLeftComments: s => s.usersLeftComments,
-
-
+        userRoles: s => s.userRoles,
     },
 
 }

@@ -21,7 +21,7 @@
           <td>{{ user?.name }}</td>
           <td>{{ user?.surname }}</td>
           <td>{{ user?.secondName }}</td>
-          <td>{{ user?.roleId }}</td>
+          <td>{{ getRoleById(user?.roleId).name }}</td>
           <td>
             <button class="btn" @click="editUser(index)">Редактировать</button>
           </td>
@@ -87,10 +87,11 @@
           </div>
           <div class="input-field">
             <input
+              disabled
               id="role"
               type="text"
               class="validate"
-              v-model="editingUser.roleId"
+              :value="getRoleById(editingUser.roleId)?.name"
             />
             <label for="role">Роль</label>
           </div>
@@ -108,11 +109,7 @@
       <div class="modal-footer">
         <div class="center">
           <button class="btn" @click="saveUser">
-            {{
-              create_edit_key == "create"
-                ? "Добавить"
-                : "Изменить"
-            }}
+            {{ create_edit_key == "create" ? "Добавить" : "Изменить" }}
           </button>
         </div>
       </div>
@@ -137,6 +134,12 @@ export default {
       "fetchPostUserDetails",
       "fetchPutUser",
     ]),
+    getRoleById(id) {
+      setTimeout(() => {
+        M.updateTextFields();
+      }, 0);
+      return this.userRoles?.find((item) => item.id === id);
+    },
     editUser(index) {
       this.create_edit_key = "edit";
       // Заполнение формы данными пользователя для редактирования
@@ -192,7 +195,7 @@ export default {
     }, 0);
   },
   computed: {
-    ...mapGetters(["users", "userDetails"]),
+    ...mapGetters(["users", "userDetails", "userRoles"]),
   },
 };
 </script>
