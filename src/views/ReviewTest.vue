@@ -23,7 +23,7 @@
                 id="answer"
                 type="text"
                 class="validate"
-                :class="[getAccuracy(question.id) ? 'valid' : 'invalid']"
+                :class="[getAccuracy(question.id) ? 'valid' : getAccuracy(question.id) == null ? '' : 'invalid']"
                 :value="getAnswer(question.id)"
                 disabled
               />

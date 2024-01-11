@@ -50,10 +50,15 @@
               style="margin: 0 10px"
               class="btn"
               @click="create_change_Module('edit', course.id)"
+              v-if="user?.roleId == 2"
             >
               Изменить
             </button>
-            <button class="btn" @click="deleteModule(course.id)">
+            <button
+              class="btn"
+              @click="deleteModule(course.id)"
+              v-if="user?.roleId == 2"
+            >
               <i class="material-icons">delete_forever</i>
             </button>
           </div>

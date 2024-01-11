@@ -8,6 +8,7 @@ export default {
         qanA: null,
         testUserAnsw: null,
         subjectComments: null,
+        usersTestResult: null,
     },
     mutations: {
         setGrantedModules(state, grantedModules) {
@@ -30,6 +31,10 @@ export default {
             console.log(users)
             state.users = users;
         },
+        setUsersTestResult(state, usersTestResult) {
+            state.usersTestResult = usersTestResult;
+        },
+
 
 
     },
@@ -258,6 +263,19 @@ export default {
                 throw e
             }
         },
+        async fetchGetUsersTestResultByModuleId(ctx, modeuleId) {
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/TestAnswers/GetUsersTestResultByModuleId/" + modeuleId)
+                    .then((response) => {
+                        ctx.commit('setUsersTestResult', response.data)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
 
     },
     getters: {
@@ -268,6 +286,8 @@ export default {
         qanA: s => s.qanA,
         testUserAnsw: s => s.testUserAnsw,
         subjectComments: s => s.subjectComments,
+        usersTestResult: s => s.usersTestResult,
+
 
 
 

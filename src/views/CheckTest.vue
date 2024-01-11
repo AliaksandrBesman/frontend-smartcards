@@ -20,6 +20,13 @@
                 id="answer"
                 type="text"
                 class="validate"
+                :class="[
+                  getAccuracy(question.id)
+                    ? 'valid'
+                    : getAccuracy(question.id) == null
+                    ? ''
+                    : 'invalid',
+                ]"
                 :value="getAnswer(question.id)"
                 disabled
               />
@@ -34,7 +41,9 @@
                 >
                   Неверно
                 </button>
-                <button class="btn" @click="putAnswer(question, true)">Верно</button>
+                <button class="btn" @click="putAnswer(question, true)">
+                  Верно
+                </button>
               </div>
             </div>
           </div>
@@ -68,17 +77,21 @@ export default {
     getAnswer(index) {
       return this.testUserAnsw.find((u) => u.questionId === index).answer;
     },
+    getAccuracy(index) {
+      console.log(this.testUserAnsw);
+      return this.testUserAnsw.find((u) => u.questionId === index).accuracy;
+    },
     putAnswer(question, flag) {
       const checked_test = this.testUserAnsw.find(
         (u) => u.questionId === question.id
       );
       checked_test.accuracy = flag;
-      this.JustTestMRemoveIT({
-        qanA: this.qanA,
-        testUserAnsw: this.testUserAnsw,
-        question: question,
-        checked_test: checked_test,
-      });
+      // this.JustTestMRemoveIT({
+      //   qanA: this.qanA,
+      //   testUserAnsw: this.testUserAnsw,
+      //   question: question,
+      //   checked_test: checked_test,
+      // });
 
       // console.log(question);
       // question.accuracy = false;
@@ -90,7 +103,7 @@ export default {
       //   answer: this.getAnswer(question.id),
       // };
 
-      console.log(question);
+      // console.log(question);
       this.fetchPutTestAnswer(checked_test);
     },
   },
