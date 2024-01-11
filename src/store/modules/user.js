@@ -3,6 +3,7 @@ import axios from 'axios'
 export default {
     state: {
         userDetails: null,
+        usersDetails: null,
         notGrantedUsers: null,
         userCompletedCourse: null,
         usersLeftComments: null,
@@ -13,6 +14,10 @@ export default {
         setUserDetails(state, userDetails) {
             state.userDetails = userDetails;
         },
+        setUsersDetails(state, usersDetails) {
+            state.usersDetails = usersDetails;
+        },
+
         setNotGrantedUser(state, notGrantedUsers) {
             state.notGrantedUsers = notGrantedUsers;
         },
@@ -55,6 +60,9 @@ export default {
         async fetchPutUser(ctx, user) {
             try {
                 await axios.put(process.env.VUE_APP_BACKEND_URL + "/api/Users/" + user.user.id, user.user)
+                    .then((response) => {
+                    })
+                await axios.put(process.env.VUE_APP_BACKEND_URL + "/api/UserDetails/"+user.userDetails.id, user.userDetails)
                     .then((response) => {
                     })
             } catch (e) {
@@ -148,6 +156,20 @@ export default {
                 throw e
             }
         },
+        async fetchGetUsersDetails(ctx) {
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/UserDetails")
+                    .then((response) => {
+                        ctx.commit('setUsersDetails', response.data)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
 
         async fetchGetUserModuleAuthor(ctx, userId) {
             console.log("fetchGetAllUsers")
@@ -169,6 +191,7 @@ export default {
     },
     getters: {
         userDetails: s => s.userDetails,
+        usersDetails: s => s.usersDetails,
         notGrantedUsers: s => s.notGrantedUsers,
         userCompletedCourse: s => s.userCompletedCourse,
         usersLeftComments: s => s.usersLeftComments,

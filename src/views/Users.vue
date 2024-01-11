@@ -2,7 +2,7 @@
   <div>
     <h1>Список пользователей</h1>
     <button class="btn" @click="openCreateDialog()">Добавить</button>
-    <table>
+    <table v-if="users">
       <thead>
         <tr>
           <th>Логин</th>
@@ -15,13 +15,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(user, index) in users" :key="index">
+        <tr v-for="(user, index) in users" :key="user.id">
           <td>{{ user?.login }}</td>
           <td>{{ user?.password }}</td>
           <td>{{ user?.name }}</td>
           <td>{{ user?.surname }}</td>
           <td>{{ user?.secondName }}</td>
-          <td>{{ getRoleById(user?.roleId).name }}</td>
+          <td>{{ getRoleById(user?.roleId)?.name }}</td>
           <td>
             <button class="btn" @click="editUser(index)">Редактировать</button>
           </td>
@@ -39,8 +39,9 @@
               : "Редактировать пользователя"
           }}
         </h4>
-        <form>
-          <div class="input-field">
+        <!--  -->
+        <div class="row">
+          <div class="input-field col s4">
             <input
               id="login"
               type="text"
@@ -49,16 +50,37 @@
             />
             <label for="login">Логин</label>
           </div>
-          <div class="input-field">
+          <div class="input-field col s4">
             <input
-              id="password"
+              id="login"
               type="text"
               class="validate"
               v-model="editingUser.password"
             />
-            <label for="password">Пароль</label>
+            <label for="login">Пароль</label>
           </div>
-          <div class="input-field">
+          <div class="input-field col s4" v-if="create_edit_key == 'edit'">
+            <input
+              id="role"
+              type="text"
+              class="validate"
+              :value="getRoleById(editingUser?.roleId)?.name"
+              disabled
+            />
+            <label for="role">Роль</label>
+          </div>
+          <div class="input-field col s4" v-else>
+            <!-- <select v-model="editingUser.roleId" :disabled="isEditing"> -->
+            <select v-model="editingUser.roleId" ref="select_user_role_id">
+              <option value="1">Админ</option>
+              <option value="2">Учитель</option>
+              <option value="3">Ученик</option>
+            </select>
+            <label>Роль</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s4">
             <input
               id="name"
               type="text"
@@ -67,7 +89,7 @@
             />
             <label for="name">Имя</label>
           </div>
-          <div class="input-field">
+          <div class="input-field col s4">
             <input
               id="surname"
               type="text"
@@ -76,26 +98,27 @@
             />
             <label for="surname">Фамилия</label>
           </div>
-          <div class="input-field">
+          <div class="input-field col s4">
             <input
-              id="secondName"
+              id="patronymic"
               type="text"
               class="validate"
               v-model="editingUser.secondName"
             />
-            <label for="secondName">Отчество</label>
+            <label for="patronymic">Отчество</label>
           </div>
-          <div class="input-field">
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
             <input
-              disabled
-              id="role"
+              id="faculty"
               type="text"
               class="validate"
-              :value="getRoleById(editingUser.roleId)?.name"
+              v-model="editingUserDetails.faculty"
             />
-            <label for="role">Роль</label>
+            <label for="faculty">Факультет</label>
           </div>
-          <div class="input-field">
+          <div class="input-field col s6">
             <input
               id="department"
               type="text"
@@ -104,7 +127,37 @@
             />
             <label for="department">Кафедра</label>
           </div>
-        </form>
+        </div>
+        <div class="row">
+          <div class="input-field col s4">
+            <input
+              id="specialization"
+              type="text"
+              class="validate"
+              v-model="editingUserDetails.speciality"
+            />
+            <label for="specialization">Специализация</label>
+          </div>
+          <div class="input-field col s2">
+            <input
+              id="course"
+              type="text"
+              class="validate"
+              v-model="editingUserDetails.course"
+            />
+            <label for="course">Курс</label>
+          </div>
+          <div class="input-field col s6">
+            <input
+              id="group"
+              type="text"
+              class="validate"
+              v-model="editingUserDetails.group"
+            />
+            <label for="group">Группа</label>
+          </div>
+        </div>
+        <!--  -->
       </div>
       <div class="modal-footer">
         <div class="center">
@@ -133,6 +186,7 @@ export default {
       "fetchPostUser",
       "fetchPostUserDetails",
       "fetchPutUser",
+      "fetchGetUsersDetails",
     ]),
     getRoleById(id) {
       setTimeout(() => {
@@ -144,6 +198,10 @@ export default {
       this.create_edit_key = "edit";
       // Заполнение формы данными пользователя для редактирования
       this.editingUser = Object.assign({}, this.users[index]);
+      this.editingUserDetails = Object.assign(
+        {},
+        this.usersDetails?.find((u) => u.id == this.users[index].userdetailsid)
+      );
 
       // Открытие модального окна
       const modal = document.querySelector(".modal");
@@ -155,29 +213,34 @@ export default {
     },
     openCreateDialog() {
       this.create_edit_key = "create";
+      this.editingUser = Object.assign({});
+      this.editingUserDetails = Object.assign({});
       // Открытие модального окна
       const modal = document.querySelector(".modal");
       const instance = M.Modal.getInstance(modal);
       instance.open();
       setTimeout(() => {
+        M.FormSelect.init(this.$refs.select_user_role_id);
         M.updateTextFields();
       }, 0);
     },
     async saveUser() {
-      console.log("createUser");
+      console.log("saveUser");
       console.log(this.create_edit_key);
       const user = {
         user: this.editingUser,
         userDetails: this.editingUserDetails,
       };
+      console.log(user);
       if (this.create_edit_key === "create") {
         await this.fetchPostUser(user);
-        // this.fetchPostUser(this.editingUser);
       } else {
         this.fetchPutUser(user);
       }
       console.log("closing");
       await this.fetchGetAllUsers();
+      await this.fetchGetUsersDetails();
+
       // Закрытие модального окна
       const modal = document.querySelector(".modal");
       const instance = M.Modal.getInstance(modal);
@@ -187,15 +250,17 @@ export default {
   async mounted() {
     // Инициализация модального окна
     await this.fetchGetAllUsers();
+    await this.fetchGetUsersDetails();
 
     await setTimeout(() => {
       const modal = document.querySelector(".modal");
       M.Modal.init(modal);
+      M.FormSelect.init(this.$refs.select_user_role_id);
       M.updateTextFields();
     }, 0);
   },
   computed: {
-    ...mapGetters(["users", "userDetails", "userRoles"]),
+    ...mapGetters(["users", "usersDetails", "userRoles"]),
   },
 };
 </script>
