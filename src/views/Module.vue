@@ -5,10 +5,16 @@
       <div>
         <h2>{{ c_module.subject }}</h2>
         <p>Описание: {{ c_module.title }}</p>
-        <p>Автор: {{ c_module.createdById }}</p>
+        <p>Автор: {{ userModuleAuthor?.login }}</p>
       </div>
     </div>
-    <button class="btn" v-if="user?.roleId == 2" @click.prevent="OpenAssignDialog">Дать доступ</button>
+    <button
+      class="btn"
+      v-if="user?.roleId == 2"
+      @click.prevent="OpenAssignDialog"
+    >
+      Дать доступ
+    </button>
   </div>
 
   <CardList :cards="qanA" v-if="qanA?.length" />
@@ -100,6 +106,7 @@ export default {
       "fetchGetTestResultByUserAndSubId",
       "fetchGetAllNotGrantedUserstByUserAndSubI",
       "fetchPostGrantingAccess",
+      "fetchGetUserModuleAuthor",
     ]),
     OpenAssignDialog() {
       // Открытие модального окна
@@ -110,12 +117,14 @@ export default {
         M.updateTextFields();
       }, 0);
     },
-   async AssignUser(user) {
-     await this.fetchPostGrantingAccess({
+    async AssignUser(user) {
+      await this.fetchPostGrantingAccess({
         userId: user.id,
         subjectLessonId: this.$route.params.id,
       });
-      await this.fetchGetAllNotGrantedUserstByUserAndSubI({subjectId: this.$route.params.id});
+      await this.fetchGetAllNotGrantedUserstByUserAndSubI({
+        subjectId: this.$route.params.id,
+      });
     },
   },
   computed: {
@@ -125,13 +134,16 @@ export default {
       "qanA",
       "testUserAnsw",
       "notGrantedUsers",
+      "userModuleAuthor"
     ]),
   },
   async mounted() {
     const modals = document.querySelectorAll(".modal");
     M.Modal.init(modals);
     if (this.user?.roleId == 2) {
-      await this.fetchGetAllNotGrantedUserstByUserAndSubI({subjectId: this.$route.params.id});
+      await this.fetchGetAllNotGrantedUserstByUserAndSubI({
+        subjectId: this.$route.params.id,
+      });
     }
     await this.fetchModuleById(this.$route.params.id);
     await this.fetchQanABySubLId(this.$route.params.id);
@@ -139,6 +151,7 @@ export default {
       userId: this.user.id,
       subjectId: this.$route.params.id,
     });
+    await this.fetchGetUserModuleAuthor(this.c_module.createdById);
     console.log(this.testUserAnsw);
   },
 };

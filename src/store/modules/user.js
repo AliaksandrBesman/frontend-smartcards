@@ -7,6 +7,7 @@ export default {
         userCompletedCourse: null,
         usersLeftComments: null,
         userRoles: null,
+        userModuleAuthor: null,
     },
     mutations: {
         setUserDetails(state, userDetails) {
@@ -24,6 +25,10 @@ export default {
         setUserRoles(state, userRoles) {
             state.userRoles = userRoles;
         },
+        setUserModuleAuthor(state, userModuleAuthor) {
+            state.userModuleAuthor = userModuleAuthor;
+        },
+
 
 
 
@@ -144,6 +149,21 @@ export default {
             }
         },
 
+        async fetchGetUserModuleAuthor(ctx, userId) {
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/Users/" + userId)
+                    .then((response) => {
+                        ctx.commit('setUserModuleAuthor', response.data)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+
 
 
     },
@@ -153,6 +173,7 @@ export default {
         userCompletedCourse: s => s.userCompletedCourse,
         usersLeftComments: s => s.usersLeftComments,
         userRoles: s => s.userRoles,
+        userModuleAuthor: s => s.userModuleAuthor
     },
 
 }

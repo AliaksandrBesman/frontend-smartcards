@@ -99,6 +99,7 @@ export default {
         this.newComment.name = "";
         this.newComment.text = "";
         await this.fetctGetCommentsBySubjectId(this.$route.params.id);
+        await this.fetchGetUsersLeftCommentsByModuleId(this.$route.params.id);
       }
     },
     async ShowHideComment(type, comment) {

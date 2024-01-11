@@ -183,31 +183,50 @@ export default {
             }
         },
         async fetchDeleteSubjectLesson(ctx, subjectLessonId) {
-
             try {
-
                 let subjectLessonsId = null;
                 await axios.
                     delete(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/" + subjectLessonId)
                     .then((response) => {
                     })
-                // subjectLesson.qanA.forEach(element => {
-                //     axios.put(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/"+element.id, element)
-                //         .then((response) => {
-
-                //         })
-                // });
-
 
             } catch (e) {
-
                 console.log("fetchLogin Error:");
                 console.log(e);
                 throw e
             }
         },
-        async fetchPutSubjectLesson(ctx, subjectLesson) {
+        async fetchDeleteTestAnswerForModule(ctx, moduleId) {
+            try {
+                let subjectLessonsId = null;
+                await axios.
+                    delete(process.env.VUE_APP_BACKEND_URL + "/api/TestAnswers/DeleteTestAnswerForModule/" + moduleId)
+                    .then((response) => {
+                    })
 
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchDeleteModuleQuestion(ctx, moduleQuestionId) {
+            try {
+                let subjectLessonsId = null;
+                await axios.
+                    delete(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/" + moduleQuestionId)
+                    .then((response) => {
+                    })
+
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+
+        async fetchPutSubjectLesson(ctx, subjectLesson) {
+            debugger
             try {
 
                 let subjectLessonsId = null;
@@ -215,11 +234,30 @@ export default {
                     put(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/" + subjectLesson.subjectLesson.id, subjectLesson.subjectLesson)
                     .then((response) => {
                     })
-                subjectLesson.qanA.forEach(element => {
-                    axios.put(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/" + element.id, element)
-                        .then((response) => {
+                try {
+                    if (subjectLesson.qanA.some(item => item.id == null)) {
+                        await axios.
+                            delete(process.env.VUE_APP_BACKEND_URL + "/api/TestAnswers/DeleteTestAnswerForModule/" + subjectLesson.subjectLesson.id)
+                            .then((response) => {
+                            })
+                    }
+                } catch (e) {
 
-                        })
+                }
+
+                subjectLesson.qanA.forEach(element => {
+                    if (element.id == null) {
+
+                        axios.post(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers", element)
+                            .then((response) => {
+
+                            })
+                    } else {
+                        axios.put(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/" + element.id, element)
+                            .then((response) => {
+                            })
+                    }
+
                 });
 
 

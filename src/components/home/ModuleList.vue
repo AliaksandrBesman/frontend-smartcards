@@ -126,6 +126,9 @@
               />
               <label :for="'answer' + index">Ответ</label>
             </div>
+            <button class="btn" @click="removeQuestion(index)">
+              Удалить вопрос
+            </button>
           </div>
         </div>
 
@@ -172,6 +175,8 @@ export default {
       "fetchQanABySubLId",
       "fetchPutSubjectLesson",
       "fetchDeleteSubjectLesson",
+      "fetchDeleteModuleQuestion",
+      "fetchDeleteTestAnswerForModule"
     ]),
     async create_change_Module(type, module_id = 0) {
       this.create_edit_type = type;
@@ -209,6 +214,13 @@ export default {
       setTimeout(() => {
         M.updateTextFields();
       }, 0);
+    },
+    removeQuestion(index) {
+      if (this.create_edit_type == "edit") {
+        this.fetchDeleteModuleQuestion(this.module.questions[index].id);
+      }
+
+      this.module.questions.splice(index, 1);
     },
     async saveModule() {
       const subjectLesson = {
@@ -271,7 +283,7 @@ export default {
     } else {
       console.log(
         "await this.fetchGrantedModulesByUserId(this.user.id);" +
-          "await this.fetchGrantedModulesByUserId(this.user.id);"
+        "await this.fetchGrantedModulesByUserId(this.user.id);"
       );
       await this.fetchGrantedModulesByUserId(this.user.id);
     }
