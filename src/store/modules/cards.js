@@ -68,9 +68,9 @@ export default {
                 .then((response) => {
                     console.log(response.data);
                     const module = response.data;
-                    setTimeout(() => {
-                        ctx.commit('setModule', module)
-                    }, 0)
+                    // setTimeout(() => {
+                    ctx.commit('setModule', module)
+                    // }, 0)
                 })
         },
         async fetchQanABySubLId(ctx, moduleId) {
@@ -79,9 +79,9 @@ export default {
                 .then((response) => {
                     console.log(response.data);
                     const qanA = response.data;
-                    setTimeout(() => {
-                        ctx.commit('setQanA', qanA)
-                    }, 0)
+                    // setTimeout(() => {
+                    ctx.commit('setQanA', qanA)
+                    // }, 0)
                 })
         },
         async fetchSaveTest(ctx, testData) {
@@ -172,6 +172,54 @@ export default {
                     .then((response) => {
                     })
             } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchDeleteSubjectLesson(ctx, subjectLessonId) {
+
+            try {
+
+                let subjectLessonsId = null;
+                await axios.
+                    delete(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/" + subjectLessonId)
+                    .then((response) => {
+                    })
+                // subjectLesson.qanA.forEach(element => {
+                //     axios.put(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/"+element.id, element)
+                //         .then((response) => {
+
+                //         })
+                // });
+
+
+            } catch (e) {
+
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchPutSubjectLesson(ctx, subjectLesson) {
+
+            try {
+
+                let subjectLessonsId = null;
+                await axios.
+                    put(process.env.VUE_APP_BACKEND_URL + "/api/SubjectLessons/" + subjectLesson.subjectLesson.id, subjectLesson.subjectLesson)
+                    .then((response) => {
+                    })
+                subjectLesson.qanA.forEach(element => {
+                    axios.put(process.env.VUE_APP_BACKEND_URL + "/api/QuestionAnswers/" + element.id, element)
+                        .then((response) => {
+
+                        })
+                });
+
+
+            } catch (e) {
+
                 console.log("fetchLogin Error:");
                 console.log(e);
                 throw e

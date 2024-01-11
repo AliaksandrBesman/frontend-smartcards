@@ -1,7 +1,11 @@
 <template>
   <div>
     <h2>Курсы</h2>
-    <button class="btn" @click="createModule" v-if="user?.roleId == 2">
+    <button
+      class="btn"
+      @click="create_change_Module('create')"
+      v-if="user?.roleId == 2"
+    >
       Создать
     </button>
     <div class="row" v-if="grantedModules?.length">
@@ -28,8 +32,8 @@
     <div class="row" v-if="grantedModules?.length">
       <div
         class="col s12 m6 l4"
-        v-for="(course, index) in filteredGrantedModules"
-        :key="index"
+        v-for="course in filteredGrantedModules"
+        :key="course.id"
       >
         <div class="card">
           <div class="card-content">
@@ -40,8 +44,18 @@
             <router-link
               :to="'/module/' + course.id"
               class="waves-effect waves-light btn"
-              >Перейти на курс</router-link
+              >Перейти</router-link
             >
+            <button
+              style="margin: 0 10px"
+              class="btn"
+              @click="create_change_Module('edit', course.id)"
+            >
+              Изменить
+            </button>
+            <button class="btn" @click="deleteModule(course.id)">
+              <i class="material-icons">delete_forever</i>
+            </button>
           </div>
         </div>
       </div>
@@ -50,60 +64,71 @@
     <!-- Модальное окно для создания теста -->
     <div id="createModal" class="modal">
       <div class="modal-content">
-        <h4>Добавить модуль</h4>
-        <form>
-          <div class="input-field">
-            <input
-              id="testSubject"
-              type="text"
-              class="validate"
-              v-model="newTest.subject"
-            />
-            <label for="testSubject">Предмет</label>
+        <h3>
+          {{
+            create_edit_type == "create"
+              ? "Добавить модуль"
+              : "Редактирование обучающего модуля"
+          }}
+        </h3>
+
+        <div class="input-field">
+          <input
+            id="subject"
+            type="text"
+            v-model="module.subject"
+            placeholder="Предмет"
+          />
+          <label for="subject">Предмет</label>
+        </div>
+
+        <div class="input-field">
+          <textarea
+            id="description"
+            class="materialize-textarea"
+            v-model="module.description"
+            placeholder="Описание"
+          ></textarea>
+          <label for="description">Описание</label>
+        </div>
+
+        <h4>Тестовые вопросы</h4>
+
+        <div
+          v-for="(question, index) in module.questions"
+          :key="question.id"
+          class="card"
+        >
+          <div class="card-content">
+            <span class="card-title">Вопрос {{ index + 1 }}</span>
+
+            <div class="input-field">
+              <input
+                :id="'question' + index"
+                type="text"
+                v-model="question.question"
+                placeholder="Вопрос"
+              />
+              <label :for="'question' + index">Вопрос</label>
+            </div>
+
+            <div class="input-field">
+              <input
+                :id="'answer' + index"
+                type="text"
+                v-model="question.answer"
+                placeholder="Ответ"
+              />
+              <label :for="'answer' + index">Ответ</label>
+            </div>
           </div>
-          <div class="input-field">
-            <input
-              id="testName"
-              type="text"
-              class="validate"
-              v-model="newTest.title"
-            />
-            <label for="testName">Описание</label>
+        </div>
+
+        <div class="row">
+          <div class="col s6">
+            <button class="btn" @click="addQuestion">Добавить вопрос</button>
           </div>
-          <div class="input-field">
-            <textarea
-              id="testQuest"
-              class="materialize-textarea"
-              v-model="question_answer.question"
-            ></textarea>
-            <label for="testQuest">Вопрос</label>
-          </div>
-          <div class="input-field">
-            <input
-              id="testAnswer"
-              type="text"
-              class="validate"
-              v-model="question_answer.answer"
-            />
-            <label for="testAnswer">Ответ</label>
-          </div>
-          <button
-            class="waves-effect waves-light btn"
-            @click.prevent="addTestCard"
-          >
-            Добавить
-          </button>
-          <ul class="collection" v-if="questions_answers?.length">
-            <li
-              class="collection-item"
-              v-for="(qa, index) in questions_answers"
-              :key="index"
-            >
-              <span class="title">{{ qa.question }}</span>
-              <p>{{ qa.answer }}</p>
-            </li>
-          </ul>
-        </form>
+        </div>
       </div>
       <div class="modal-footer" style="text-align: center">
         <button
@@ -125,9 +150,12 @@ export default {
       selectedTopic: "",
       sortOrder: "asc",
       searchQuery: "",
-      newTest: {},
-      question_answer: {},
-      questions_answers: [],
+      module: {
+        subject: "",
+        description: "",
+        questions: [],
+      },
+      create_edit_type: null,
     };
   },
   methods: {
@@ -135,10 +163,30 @@ export default {
       "fetchGrantedModulesByUserId",
       "fetchGrantedSubjectLessonByCreatedById",
       "fetchPostSubjectLesson",
+      "fetchModuleById",
+      "fetchQanABySubLId",
+      "fetchPutSubjectLesson",
+      "fetchDeleteSubjectLesson",
     ]),
-    createModule() {
-      this.questions_answers = [];
-      this.question_answer = {};
+    async create_change_Module(type, module_id = 0) {
+      this.create_edit_type = type;
+      if (type == "create") {
+        this.module = {
+          subject: "",
+          description: "",
+          questions: [],
+        };
+      } else {
+        await this.fetchModuleById(module_id);
+        await this.fetchQanABySubLId(module_id);
+
+        this.module = {
+          subject: this.c_module.subject,
+          description: this.c_module.title,
+          questions: this.qanA,
+        };
+      }
+
       // Открытие модального окна
       const modal = document.querySelector(".modal");
       const instance = M.Modal.getInstance(modal);
@@ -147,24 +195,40 @@ export default {
         M.updateTextFields();
       }, 0);
     },
-    addTestCard() {
-      this.questions_answers.push({ ...this.question_answer });
+    async deleteModule(sId) {
+      await this.fetchDeleteSubjectLesson(sId);
+      await this.fetchGrantedSubjectLessonByCreatedById(this.user.id);
     },
-    saveModule() {
+    addQuestion() {
+      this.module.questions.push({ question: "", answer: "" });
+      setTimeout(() => {
+        M.updateTextFields();
+      }, 0);
+    },
+    async saveModule() {
       const subjectLesson = {
         subjectLesson: {
-          subject: this.newTest.subject,
-          title: this.newTest.title,
+          subject: this.module.subject,
+          title: this.module.description,
           createdById: this.user.id,
         },
-        qanA: this.questions_answers,
+        qanA: this.module.questions,
       };
+      if (this.create_edit_type == "edit") {
+        subjectLesson.subjectLesson.id = this.c_module.id;
+        subjectLesson.qanA.forEach((element) => {
+          element.subjectLessonId = this.c_module.id;
+        });
+        await this.fetchPutSubjectLesson(subjectLesson);
+      } else {
+        await this.fetchPostSubjectLesson(subjectLesson);
+      }
+      await this.fetchGrantedSubjectLessonByCreatedById(this.user.id);
       console.log(subjectLesson);
-      this.fetchPostSubjectLesson(subjectLesson);
     },
   },
   computed: {
-    ...mapGetters(["grantedModules", "user"]),
+    ...mapGetters(["grantedModules", "user", "c_module", "qanA"]),
     filteredGrantedModules() {
       let grantedModules = this.grantedModules;
       if (this.selectedTopic) {
