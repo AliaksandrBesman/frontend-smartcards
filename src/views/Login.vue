@@ -12,20 +12,30 @@
               id="login"
               type="text"
               v-model="login"
+              :class="{ invalid: v$.password.$error }"
             />
             <label for="login">Login</label>
-            <!-- <span
+            <span
               v-if="v$.login.$error"
               class="helper-text"
-              :data-error="v$.login.required.$message"
-            ></span> -->
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <input id="password" type="password" v-model="password" />
+            <input
+              id="password"
+              type="password"
+              v-model="password"
+              :class="{ invalid: v$.password.$error }"
+            />
             <label for="password">Password</label>
-            <!-- <span v-if="v$.password.$error" class="helper-text" :data-error="v$.password.required.$message"></span> -->
+            <span
+              v-if="v$.password.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
         </div>
       </form>
@@ -44,8 +54,20 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex'
+import { mapActions } from "vuex";
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
+
 export default {
+  setup() {
+    return { v$: useVuelidate() };
+  },
+  validations() {
+    return {
+      login: { required },
+      password: { required },
+    };
+  },
   name: "Login",
   data() {
     return {
@@ -56,7 +78,10 @@ export default {
   },
   methods: {
     ...mapActions(["fetchLogin"]),
-  async  loginUser() {
+    async loginUser() {
+      const valid_result = await this.v$.$validate();
+
+      if (!valid_result) return;
 
       const userInfo = {
         login: this.login,
@@ -64,11 +89,9 @@ export default {
       };
 
       try {
-       await this.fetchLogin(userInfo);
-       await this.$router.push("/");
-      } catch (e) {
-
-      }
+        await this.fetchLogin(userInfo);
+        await this.$router.push("/");
+      } catch (e) {}
     },
   },
   mounted() {

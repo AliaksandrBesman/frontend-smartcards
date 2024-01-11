@@ -7,12 +7,12 @@
     <div class="row" v-if="grantedModules?.length">
       <div class="input-field col s12 m4">
         <select v-model="selectedTopic" ref="select_filter_id">
-          <option value="">Выберите тему курса</option>
+          <option value="">Выберите предмет курса</option>
           <option v-for="topic in topics" :key="topic.id" :value="topic.id">
             {{ topic.name }}
           </option>
         </select>
-        <label>Тема курса</label>
+        <label>Предмет курса</label>
       </div>
       <div class="input-field col s12 m4">
         <select v-model="sortOrder" ref="select_sorter_id">
