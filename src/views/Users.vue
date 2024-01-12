@@ -75,22 +75,11 @@
               :data-error="'Обязательное поле'"
             ></span>
           </div>
-          <div class="input-field col s4" v-if="create_edit_key == 'edit'">
-            <input
-              id="role"
-              type="text"
-              class="validate"
-              :value="getRoleById(editingUser?.roleId)?.name"
-              disabled
-            />
-            <label for="role">Роль</label>
-          </div>
-          <div class="input-field col s4" v-else>
-            <!-- <select v-model="editingUser.roleId" :disabled="isEditing"> -->
+          <div class="input-field col s4">
             <select v-model="editingUser.roleId" ref="select_user_role_id">
-              <option value="1">Админ</option>
-              <option value="2">Учитель</option>
-              <option value="3">Ученик</option>
+              <option :value="1">Админ</option>
+              <option :value="2">Учитель</option>
+              <option :value="3">Ученик</option>
             </select>
             <label>Роль</label>
           </div>
@@ -267,6 +256,7 @@ export default {
       editingUserDetails: {},
       create_edit_key: null,
       user_exists: false,
+      roleId_dropDowns: null,
     };
   },
   methods: {
@@ -300,6 +290,9 @@ export default {
       const instance = M.Modal.getInstance(modal);
       instance.open();
       setTimeout(() => {
+        this.roleId_dropDowns = M.FormSelect.init(
+          this.$refs.select_user_role_id
+        );
         M.updateTextFields();
       }, 0);
     },
@@ -312,7 +305,9 @@ export default {
       const instance = M.Modal.getInstance(modal);
       instance.open();
       setTimeout(() => {
-        M.FormSelect.init(this.$refs.select_user_role_id);
+        this.roleId_dropDowns = M.FormSelect.init(
+          this.$refs.select_user_role_id
+        );
         M.updateTextFields();
       }, 0);
     },
@@ -360,7 +355,7 @@ export default {
     await setTimeout(() => {
       const modal = document.querySelector(".modal");
       M.Modal.init(modal);
-      M.FormSelect.init(this.$refs.select_user_role_id);
+      this.roleId_dropDowns = M.FormSelect.init(this.$refs.select_user_role_id);
       M.updateTextFields();
     }, 0);
   },
