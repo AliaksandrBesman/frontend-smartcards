@@ -2,7 +2,7 @@
   <h4>
     Cтуденты выполнившие модуль{{ "( " + userCompletedCourse?.length + " )" }}
   </h4>
-  <div v-if="userCompletedCourse?.length && usersTestResult">
+  <div v-if="userCompletedCourse?.length && usersTestResult && usersWithCheckedTest?.length">
     <p>Лучший результат: {{ bestResult }}</p>
     <p>Средний результат: {{ averageResult }}</p>
     <p>Худший результат: {{ worstResult }}</p>

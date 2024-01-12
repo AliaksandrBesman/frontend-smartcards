@@ -254,10 +254,10 @@ export default {
       },
       editingUserDetails: {
         faculty: { required },
-        department: { required },
-        speciality: { required },
-        course: { required },
-        group: { required },
+        department: {},
+        speciality: {},
+        course: {},
+        group: {},
       },
     };
   },
@@ -318,10 +318,19 @@ export default {
     },
     async saveUser() {
       this.user_exists = false;
-      const userExist = this.checkIfUserExists(this.editingUser.login)
-      if(userExist) this.user_exists = true;
+      const userExist = this.checkIfUserExists(this.editingUser.login);
+      if (userExist) {
+        if (this.create_edit_key == "create") {
+          this.user_exists = true;
+        } else {
+          const olduser = this.users.find((u) => u.id == this.editingUser.id);
+          if (olduser.login != this.editingUser.login) {
+            this.user_exists = true;
+          }
+        }
+      }
       const valid_result = await this.v$.$validate();
-      if (!valid_result || userExist) return;
+      if (!valid_result || this.user_exists) return;
 
       const user = {
         user: this.editingUser,

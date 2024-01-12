@@ -6,7 +6,7 @@
         <div>
           <h2>{{ c_module.subject }}</h2>
           <p>Описание: {{ c_module.title }}</p>
-          <p>Автор: {{ c_module.createdById }}</p>
+          <p>Автор: {{ userModuleAuthor?.login }}</p>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
                 :value="getAnswer(question.id)"
                 disabled
               />
-              <label for="answer">Answer</label>
+              <label for="answer">Ответ</label>
             </div>
             <div class="row">
               <div class="col s12">
@@ -73,6 +73,7 @@ export default {
       "fetchGetTestResultByUserAndSubId",
       "fetchPutTestAnswer",
       "JustTestMRemoveIT",
+      "fetchGetUserModuleAuthor",
     ]),
     getAnswer(index) {
       return this.testUserAnsw.find((u) => u.questionId === index).answer;
@@ -108,7 +109,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["c_module", "user", "qanA", "testUserAnsw"]),
+    ...mapGetters(["c_module", "user", "qanA", "testUserAnsw","userModuleAuthor"]),
   },
   async mounted() {
     await this.fetchModuleById(this.$route.params.m_id);
@@ -117,7 +118,7 @@ export default {
       userId: this.$route.params.us_id,
       subjectId: this.$route.params.m_id,
     });
-
+  await this.fetchGetUserModuleAuthor(this.c_module.createdById);
     await setTimeout(() => {
       M.updateTextFields();
     }, 0);
