@@ -49,7 +49,7 @@
           id="patronymic"
           type="text"
           class="validate"
-          :value="user?.patronymic"
+          :value="user?.secondName"
           disabled
         />
         <label for="patronymic">Отчество</label>
@@ -61,7 +61,7 @@
           id="faculty"
           type="text"
           class="validate"
-          :value="user?.faculty"
+          :value="userDetails?.faculty"
           disabled
         />
         <label for="faculty">Факультет</label>
@@ -71,7 +71,7 @@
           id="department"
           type="text"
           class="validate"
-          :value="user?.department"
+          :value="userDetails?.department"
           disabled
         />
         <label for="department">Кафедра</label>
@@ -83,7 +83,7 @@
           id="specialization"
           type="text"
           class="validate"
-          :value="user?.specialization"
+          :value="userDetails?.speciality"
           disabled
         />
         <label for="specialization">Специализация</label>
@@ -93,7 +93,7 @@
           id="course"
           type="text"
           class="validate"
-          :value="user?.course"
+          :value="userDetails?.course"
           disabled
         />
         <label for="course">Курс</label>
@@ -103,7 +103,7 @@
           id="group"
           type="text"
           class="validate"
-          :value="user?.group"
+          :value="userDetails?.group"
           disabled
         />
         <label for="group">Группа</label>
@@ -114,12 +114,13 @@
 
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["user", "userRoles"]),
+    ...mapGetters(["user", "userRoles", "userDetails"]),
   },
   methods: {
+    ...mapActions(["fetchGetUserDetails"]),
     getRoleById(id) {
       setTimeout(() => {
         M.updateTextFields();
@@ -127,7 +128,8 @@ export default {
       return this.userRoles?.find((item) => item.id === id);
     },
   },
-  mounted() {
+  async mounted() {
+    await this.fetchGetUserDetails(this.user.userdetailsid);
     setTimeout(() => {
       M.updateTextFields();
     }, 0);

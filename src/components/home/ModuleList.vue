@@ -37,7 +37,7 @@
       >
         <div class="card">
           <div class="card-content">
-            <span class="card-title">{{ course.subject }}</span>
+            <span class="card-title">{{ ( course.subject.length > 20 ? course.subject.slice(0, 20) + '...' : course.subject ) }}</span>
             <p>{{ course.title }}</p>
           </div>
           <div class="card-action">
@@ -81,20 +81,32 @@
           <input
             id="subject"
             type="text"
+            :class="{ invalid: v$.module.subject.$error }"
             v-model="module.subject"
             placeholder="Предмет"
           />
           <label for="subject">Предмет</label>
+          <span
+            v-if="v$.module.subject.$error"
+            class="helper-text"
+            :data-error="'Обязательное поле'"
+          ></span>
         </div>
 
         <div class="input-field">
           <textarea
             id="description"
             class="materialize-textarea"
+            :class="{ invalid: v$.module.description.$error }"
             v-model="module.description"
             placeholder="Описание"
           ></textarea>
           <label for="description">Описание</label>
+          <span
+            v-if="v$.module.description.$error"
+            class="helper-text"
+            :data-error="'Обязательное поле'"
+          ></span>
         </div>
 
         <h4>Тестовые вопросы</h4>
@@ -138,9 +150,16 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col s12">
+          <span v-if="isTestEmpty" style="color: red"
+            >В тесте должен быть минимум один вопрос</span
+          >
+        </div>
+      </div>
       <div class="modal-footer" style="text-align: center">
         <button
-          class="waves-effect waves-light btn modal-close"
+          class="waves-effect waves-light btn"
           @click.prevent="saveModule"
         >
           Сохранить
@@ -151,8 +170,21 @@
 </template>
 
 <script>
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 import { mapGetters, mapActions } from "vuex";
 export default {
+  setup() {
+    return { v$: useVuelidate() };
+  },
+  validations() {
+    return {
+      module: {
+        subject: { required },
+        description: { required },
+      },
+    };
+  },
   data() {
     return {
       selectedTopic: "",
@@ -164,6 +196,7 @@ export default {
         questions: [],
       },
       create_edit_type: null,
+      isTestEmpty: null,
     };
   },
   methods: {
@@ -176,8 +209,11 @@ export default {
       "fetchPutSubjectLesson",
       "fetchDeleteSubjectLesson",
       "fetchDeleteModuleQuestion",
-      "fetchDeleteTestAnswerForModule"
+      "fetchDeleteTestAnswerForModule",
     ]),
+    isTestNotEmpty(obj) {
+      return Array.isArray(obj) && obj.length > 0;
+    },
     async create_change_Module(type, module_id = 0) {
       this.create_edit_type = type;
       if (type == "create") {
@@ -216,6 +252,7 @@ export default {
       }, 0);
     },
     removeQuestion(index) {
+      if (this.module.questions?.length < 2) return
       if (this.create_edit_type == "edit") {
         this.fetchDeleteModuleQuestion(this.module.questions[index].id);
       }
@@ -223,6 +260,12 @@ export default {
       this.module.questions.splice(index, 1);
     },
     async saveModule() {
+      const isTestNotEmpty = this.isTestNotEmpty(this.module.questions);
+      if (!isTestNotEmpty) {
+        this.isTestEmpty = true;
+      }
+      const valid_result = await this.v$.$validate();
+      if (!valid_result || !isTestNotEmpty) return;
       const subjectLesson = {
         subjectLesson: {
           subject: this.module.subject,
@@ -242,6 +285,11 @@ export default {
       }
       await this.fetchGrantedSubjectLessonByCreatedById(this.user.id);
       console.log(subjectLesson);
+
+      // Закрытие модального окна
+      const modal = document.querySelector(".modal");
+      const instance = M.Modal.getInstance(modal);
+      instance.close();
     },
   },
   computed: {
@@ -283,7 +331,7 @@ export default {
     } else {
       console.log(
         "await this.fetchGrantedModulesByUserId(this.user.id);" +
-        "await this.fetchGrantedModulesByUserId(this.user.id);"
+          "await this.fetchGrantedModulesByUserId(this.user.id);"
       );
       await this.fetchGrantedModulesByUserId(this.user.id);
     }

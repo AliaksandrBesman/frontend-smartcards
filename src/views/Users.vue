@@ -46,18 +46,34 @@
               id="login"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUser.login.$error || user_exists }"
               v-model="editingUser.login"
             />
             <label for="login">Логин</label>
+            <span
+              v-if="v$.editingUser.login.$error || user_exists"
+              class="helper-text"
+              :data-error="
+                user_exists
+                  ? 'Пользователь с таким логином уже есть'
+                  : 'Обязательное поле'
+              "
+            ></span>
           </div>
           <div class="input-field col s4">
             <input
               id="login"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUser.password.$error }"
               v-model="editingUser.password"
             />
             <label for="login">Пароль</label>
+            <span
+              v-if="v$.editingUser.password.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
           <div class="input-field col s4" v-if="create_edit_key == 'edit'">
             <input
@@ -85,27 +101,45 @@
               id="name"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUser.name.$error }"
               v-model="editingUser.name"
             />
             <label for="name">Имя</label>
+            <span
+              v-if="v$.editingUser.name.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
           <div class="input-field col s4">
             <input
               id="surname"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUser.surname.$error }"
               v-model="editingUser.surname"
             />
             <label for="surname">Фамилия</label>
+            <span
+              v-if="v$.editingUser.surname.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
           <div class="input-field col s4">
             <input
               id="patronymic"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUser.secondName.$error }"
               v-model="editingUser.secondName"
             />
             <label for="patronymic">Отчество</label>
+            <span
+              v-if="v$.editingUser.secondName.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
         </div>
         <div class="row">
@@ -114,18 +148,30 @@
               id="faculty"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUserDetails.faculty.$error }"
               v-model="editingUserDetails.faculty"
             />
             <label for="faculty">Факультет</label>
+            <span
+              v-if="v$.editingUserDetails.faculty.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
           <div class="input-field col s6">
             <input
               id="department"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUserDetails.department.$error }"
               v-model="editingUserDetails.department"
             />
             <label for="department">Кафедра</label>
+            <span
+              v-if="v$.editingUserDetails.department.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
         </div>
         <div class="row">
@@ -134,27 +180,45 @@
               id="specialization"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUserDetails.speciality.$error }"
               v-model="editingUserDetails.speciality"
             />
             <label for="specialization">Специализация</label>
+            <span
+              v-if="v$.editingUserDetails.speciality.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
           <div class="input-field col s2">
             <input
               id="course"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUserDetails.course.$error }"
               v-model="editingUserDetails.course"
             />
             <label for="course">Курс</label>
+            <span
+              v-if="v$.editingUserDetails.course.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
           <div class="input-field col s6">
             <input
               id="group"
               type="text"
               class="validate"
+              :class="{ invalid: v$.editingUserDetails.group.$error }"
               v-model="editingUserDetails.group"
             />
             <label for="group">Группа</label>
+            <span
+              v-if="v$.editingUserDetails.group.$error"
+              class="helper-text"
+              :data-error="'Обязательное поле'"
+            ></span>
           </div>
         </div>
         <!--  -->
@@ -171,13 +235,38 @@
 </template>
 
 <script>
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 import { mapGetters, mapActions } from "vuex";
 export default {
+  setup() {
+    return { v$: useVuelidate() };
+  },
+  validations() {
+    return {
+      editingUser: {
+        login: { required },
+        password: { required },
+        name: { required },
+        surname: { required },
+        secondName: { required },
+        roleId: { required },
+      },
+      editingUserDetails: {
+        faculty: { required },
+        department: { required },
+        speciality: { required },
+        course: { required },
+        group: { required },
+      },
+    };
+  },
   data() {
     return {
       editingUser: {},
       editingUserDetails: {},
       create_edit_key: null,
+      user_exists: false,
     };
   },
   methods: {
@@ -188,6 +277,9 @@ export default {
       "fetchPutUser",
       "fetchGetUsersDetails",
     ]),
+    checkIfUserExists(login) {
+      return this.users.some((user) => user.login === login);
+    },
     getRoleById(id) {
       setTimeout(() => {
         M.updateTextFields();
@@ -225,8 +317,12 @@ export default {
       }, 0);
     },
     async saveUser() {
-      console.log("saveUser");
-      console.log(this.create_edit_key);
+      this.user_exists = false;
+      const userExist = this.checkIfUserExists(this.editingUser.login)
+      if(userExist) this.user_exists = true;
+      const valid_result = await this.v$.$validate();
+      if (!valid_result || userExist) return;
+
       const user = {
         user: this.editingUser,
         userDetails: this.editingUserDetails,

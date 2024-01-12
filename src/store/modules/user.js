@@ -62,7 +62,7 @@ export default {
                 await axios.put(process.env.VUE_APP_BACKEND_URL + "/api/Users/" + user.user.id, user.user)
                     .then((response) => {
                     })
-                await axios.put(process.env.VUE_APP_BACKEND_URL + "/api/UserDetails/"+user.userDetails.id, user.userDetails)
+                await axios.put(process.env.VUE_APP_BACKEND_URL + "/api/UserDetails/" + user.userDetails.id, user.userDetails)
                     .then((response) => {
                     })
             } catch (e) {
@@ -148,6 +148,22 @@ export default {
                     .then((response) => {
                         setTimeout(() => {
                             ctx.commit('setUserRoles', response.data)
+                        }, 0)
+                    })
+            } catch (e) {
+                console.log("fetchLogin Error:");
+                console.log(e);
+                throw e
+            }
+        },
+        async fetchGetUserDetails(ctx, userId) {
+            console.log("fetchGetAllUsers")
+            try {
+                await axios
+                    .get(process.env.VUE_APP_BACKEND_URL + "/api/UserDetails/" + userId)
+                    .then((response) => {
+                        setTimeout(() => {
+                            ctx.commit('setUserDetails', response.data)
                         }, 0)
                     })
             } catch (e) {
