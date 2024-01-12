@@ -76,10 +76,10 @@
             ></span>
           </div>
           <div class="input-field col s4">
-            <select v-model="editingUser.roleId" ref="select_user_role_id">
-              <option :value="1">Админ</option>
-              <option :value="2">Учитель</option>
-              <option :value="3">Ученик</option>
+            <select v-model="editingUser.roleId" ref="select_user_role_id" >
+              <option :value="1" :disabled="editingUser.roleId == 1 || create_edit_key == 'edit'">Админ</option>
+              <option :value="2" :disabled="editingUser.roleId == 1">Учитель</option>
+              <option :value="3" :disabled="editingUser.roleId == 1">Ученик</option>
             </select>
             <label>Роль</label>
           </div>

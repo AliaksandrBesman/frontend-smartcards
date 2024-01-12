@@ -37,7 +37,11 @@
       >
         <div class="card">
           <div class="card-content">
-            <span class="card-title">{{ ( course.subject.length > 20 ? course.subject.slice(0, 20) + '...' : course.subject ) }}</span>
+            <span class="card-title">{{
+              course.subject.length > 20
+                ? course.subject.slice(0, 20) + "..."
+                : course.subject
+            }}</span>
             <p>{{ course.title }}</p>
           </div>
           <div class="card-action">
@@ -125,8 +129,21 @@
                 type="text"
                 v-model="question.question"
                 placeholder="Вопрос"
+                :class="{
+                  invalid:
+                    v$.module.questions.$each.$response.$errors[index].question
+                      .length,
+                }"
               />
               <label :for="'question' + index">Вопрос</label>
+              <span
+                v-if="
+                  v$.module.questions.$each.$response.$errors[index].question
+                    .length
+                "
+                class="helper-text"
+                :data-error="'Обязательное поле'"
+              ></span>
             </div>
 
             <div class="input-field">
@@ -135,8 +152,21 @@
                 type="text"
                 v-model="question.answer"
                 placeholder="Ответ"
+                :class="{
+                  invalid:
+                    v$.module.questions.$each.$response.$errors[index].answer
+                      .length
+                }"
               />
               <label :for="'answer' + index">Ответ</label>
+              <span
+                v-if="
+                  v$.module.questions.$each.$response.$errors[index].question
+                    .length
+                "
+                class="helper-text"
+                :data-error="'Обязательное поле'"
+              ></span>
             </div>
             <button class="btn" @click="removeQuestion(index)">
               Удалить вопрос
@@ -171,7 +201,7 @@
 
 <script>
 import { useVuelidate } from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
+import { helpers, required, minLength } from "@vuelidate/validators";
 import { mapGetters, mapActions } from "vuex";
 export default {
   setup() {
@@ -182,6 +212,18 @@ export default {
       module: {
         subject: { required },
         description: { required },
+        questions: {
+          required,
+          minLength: minLength(1),
+          $each: helpers.forEach({
+            question: {
+              required,
+            },
+            answer: {
+              required,
+            },
+          }),
+        },
       },
     };
   },
@@ -252,7 +294,7 @@ export default {
       }, 0);
     },
     removeQuestion(index) {
-      if (this.module.questions?.length < 2) return
+      if (this.module.questions?.length < 2) return;
       if (this.create_edit_type == "edit") {
         this.fetchDeleteModuleQuestion(this.module.questions[index].id);
       }
@@ -263,6 +305,8 @@ export default {
       const isTestNotEmpty = this.isTestNotEmpty(this.module.questions);
       if (!isTestNotEmpty) {
         this.isTestEmpty = true;
+      }else{
+        this.isTestEmpty = false;
       }
       const valid_result = await this.v$.$validate();
       if (!valid_result || !isTestNotEmpty) return;
