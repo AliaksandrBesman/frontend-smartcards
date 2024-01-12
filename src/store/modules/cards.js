@@ -145,9 +145,9 @@ export default {
                 await axios
                     .get(process.env.VUE_APP_BACKEND_URL + "/api/Users")
                     .then((response) => {
-                        setTimeout(() => {
-                            ctx.commit('setUsers', response.data)
-                        }, 0)
+
+                        ctx.commit('setUsers', response.data)
+
                     })
             } catch (e) {
                 console.log("fetchLogin Error:");

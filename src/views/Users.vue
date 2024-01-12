@@ -335,7 +335,7 @@ export default {
       if (this.create_edit_key === "create") {
         await this.fetchPostUser(user);
       } else {
-        this.fetchPutUser(user);
+        await this.fetchPutUser(user);
       }
       console.log("closing");
       await this.fetchGetAllUsers();

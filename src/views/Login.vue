@@ -91,10 +91,13 @@ export default {
       try {
         await this.fetchLogin(userInfo);
         await this.$router.push("/");
-      } catch (e) {}
+      } catch (e) {
+        M.toast({html: 'Неверный логин или пароль!'})
+      }
     },
   },
   mounted() {
+    M.toast({html: 'Добро пожаловать!'})
     setTimeout(() => {
       M.updateTextFields();
     }, 0);

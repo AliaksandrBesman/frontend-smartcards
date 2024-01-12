@@ -4,7 +4,7 @@
       <div class="col s12">
         <!-- Информация о модуле -->
         <div>
-          <h2>{{ c_module.subject }}</h2>
+          <h2>{{ 'Решение теста по модулю: ' + c_module.subject }}</h2>
           <p>Описание: {{ c_module.title }}</p>
           <p>Автор: {{ userModuleAuthor?.login }}</p>
         </div>
@@ -25,7 +25,7 @@
                     v$.answers.$each.$response.$errors[index].answer.length,
                 }"
               ></textarea>
-              <label for="answer">Answer</label>
+              <label for="answer">Вопрос</label>
               <span
                 v-if="v$.answers.$each.$response.$errors[index].answer.length"
                 class="helper-text"

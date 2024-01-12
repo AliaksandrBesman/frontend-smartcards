@@ -4,7 +4,7 @@
       <div class="col s12">
         <!-- Информация о модуле -->
         <div>
-          <h2>{{ c_module.subject }}</h2>
+          <h2>{{ 'Просмотр попытки по модулю: ' + c_module.subject }}</h2>
           <p>Описание: {{ c_module.title }}</p>
           <p>Автор: {{ userModuleAuthor?.login }}</p>
         </div>
